@@ -31,3 +31,5 @@
   })(window.jQuery);
 
 
+  import { SpeedInsights } from "@vercel/speed-insights/next"
+
