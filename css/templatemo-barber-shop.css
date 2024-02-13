@@ -350,8 +350,20 @@ strong {
 /*---------------------------------------
   HERO        
 -----------------------------------------*/
-.hero-section {
+.img_hjem {
   background-image: url('../images/framside.jpg');
+}
+/* Define a class for each page with different background images */
+.img_kurv {
+  background-image: url('../images/kurv_sogndal.jpg');
+}
+
+.img_event {
+  background-image: url('../images/event_image.jpg');
+}
+
+/* Common styles for all hero sections */
+.hero-section {
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-size: cover;
@@ -363,6 +375,7 @@ strong {
   min-height: 665px;
   border-bottom: 15px solid var(--primary-color);
 }
+
 
 @media screen and (min-width: 991px) {
   .hero-section {
