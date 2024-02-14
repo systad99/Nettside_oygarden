@@ -22,6 +22,8 @@
 
         <link href="css/bootstrap-icons.css" rel="stylesheet">
 
+        <link href="css/style.css" rel="stylesheet">
+
         <link href="css/templatemo-barber-shop.css" rel="stylesheet">
 
         <link rel="stylesheet" href="css/flipper.css">
@@ -119,83 +121,54 @@ https://templatemo.com/tm-585-barber-shop
                                 <div class="col-lg-12 col-12 mx-auto">
                                     <h2 class="mb-4">Norske Kurver til Norske Skoger</h2>
 
-                                    <div class="border-bottom pb-3 mb-5">
+                                    <div class="border-bottom">
                                         <p>Med fokus på lokale bedrifter, bærekraft og frisbeeglede. Har vi nå snart produsert kurver på hobbybasis i fem år. </p>
                                         <!-- <a href="https://templatemo.com/page/1" target="_blank">TemplateMo</a> -->
                                     </div>
                                 </div>
-                    <section class="contact-section" id="section_5">
-                    <div class="section-padding section-bg">
-                        <div class="container">
-                            <div class="row">   
-
-                                <div class="col-lg-8 col-12 mx-auto">
-                                    <h2 class="text-center">Kontakt Oss</h2>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            
+               
                     <div class="container">
                         <div class="row">
                             <div class="col-lg-6 col-12">
-                                <div class="contact-form">
-                                    <form action="action_page.php">
-                                        <div class="row">
-                                            <div class="col-lg-6 col-12">
-                                                <input type="text" id="name" name="name" placeholder="Navn">
-                                            </div>
-                                            <div class="col-lg-6 col-12">
-                                                <input type="email" id="email" name="email" placeholder="E-post">
-                                            </div>
-                                            <div class="col-12">
-                                                <input type="text" id="subject" name="subject" placeholder="Emne">
-                                            </div>
-                                            <div class="col-12">
-                                                <textarea id="message" name="message" placeholder="Melding"></textarea>
-                                            </div>
-                                            <a href="mailto:kundeservice@oygardenfrisbee.no">
-                                                <button>Send</button>
-                                              </a>
-                                        </div>
+                                <div class="container_form">
+                                    <form>
+                                        <h3 class="mb-4">Send oss en melding</h3>
+                                        <input type="text" id="name" placeholder="Ditt navn" required>
+                                        <input type="email" id="email" placeholder="Din Mail" required>
+                                        <input type="text" id="subject" placeholder="Emne" required>
+                                        <textarea id="message" rows="4" placeholder="Hvordan kan vi hjelpe deg"></textarea>
+                                        <button type="submit" class="btn custom-btn custom-btn-bg-white mt-3">Send</button>
                                     </form>
+                                   
                                 </div>
                             </div>
+                            <script src="https://smtpjs.com/v3/smtp.js">
+                                var btn = document.getElementById('btn');
+                                btn.addEventListener('click', function(e) {
+                                    e.preventDefault();
+                                    var name = document.getElementById('name').value;
+                                    var email = document.getElementById('email').value;
+                                    var subject = document.getElementById('subject').value;
+                                    var message = document.getElementById('message').value;
+                                    var body = 'Name: ' + name + '<br>Email: ' + email + '<br>Subject: ' + subject + '<br>Message: ' + message;
+
+                                    Email.send({
+    SecureToken : "ff7bbbb5-9dd3-4810-beb4-f477a60f7023",
+    To : 'kundeservice@oygardenfrisbee.no',
+    From : "systad99@gmail.com",
+    Subject : "contact message",
+    Body : "And this is the body"
+}).then(
+  message => alert(message)
+);
+                                });
+
+
+                    
+                                
+                            </script>
                             <div class="col-lg-6 col-12">
-                                <div class="contact-info">
-                                    <h3 class="mb-4">Kontakt Informasjon</h3>
-                
-                    <div class="section-padding">
-                        <div class="container">
-                            <div class="row">
-
-                                <div class="col-lg-6 col-12">
-                                    <h5 class="mb-3"><strong>Kontakt</strong> Informasjon</h5>
-
-                                    <p class="text-white d-flex mb-1">
-                                        <a href="tel: 97570183" class="site-footer-link">
-                                            (+47) 
-                                            97 57 01 83
-                                        </a>
-                                    </p>
-
-                                    <p class="text-white d-flex">
-                                        <a href="mailto:jisystad@gmail.com" class="site-footer-link">
-                                            jisystad@gmail.com
-                                        </a>
-                                    </p>
-
-                                    <ul class="social-icon">
-                                        <li class="social-icon-item">
-                                            <a href="https://www.facebook.com/profile.php?id=100069948341157" class="social-icon-link bi-facebook">
-                                            </a>
-                                        </li>
-            
-                                        
-                                    </ul>
-                                </div>
-
-                               
-
                                 <div class="col-lg-12 col-12 mx-auto mt-5 pt-5">
                                     <iframe class="google-map" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2104.574949823341!2d7.667216677283256!3d58.16422140373099!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x46381f84f6355f0b%3A0x8a8f4943de258a94!2s%C3%98ygarden%20Frisbeegolf%20bane!5e0!3m2!1sno!2sno!4v1705247884808!5m2!1sno!2sno" width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                                 </div>
