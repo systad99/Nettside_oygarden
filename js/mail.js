@@ -8,6 +8,19 @@ btn.addEventListener('click', function(e) {
     var email = document.getElementById('email').value;
     var subject = document.getElementById('subject').value;
     var message = document.getElementById('message').value;
+    
+    // Check if any of the form fields are empty
+    if (name === '' || email === '' || subject === '' || message === '') {
+        alert('Please fill out all fields before sending the email.');
+        return;
+    }
+    
+    // Check if email field contains "@"
+    if (!email.includes('@')) {
+        alert('Please enter a valid email address.');
+        return;
+    }
+    
     var body = 'Name: ' + name + '<br>Email: ' + email + '<br>Subject: ' + subject + '<br>Message: ' + message;
     
     Email.send({
@@ -19,8 +32,6 @@ btn.addEventListener('click', function(e) {
         }).then(
             message => alert(message)
         );
-    });
-    
-                        
+});
     
                           
