@@ -138,7 +138,7 @@ https://templatemo.com/tm-585-barber-shop
                                         <input type="email" id="email" placeholder="Din Mail" required>
                                         <input type="text" id="subject" placeholder="Emne" required>
                                         <textarea id="message" rows="4" placeholder="Hvordan kan vi hjelpe deg"></textarea>
-                                        <button type="submit" class="btn custom-btn custom-btn-bg-white mt-3">Send</button>
+                                        <button id="btn">Send</button>
                                     </form>
                                    
                                 </div>
@@ -154,15 +154,15 @@ https://templatemo.com/tm-585-barber-shop
                                     var body = 'Name: ' + name + '<br>Email: ' + email + '<br>Subject: ' + subject + '<br>Message: ' + message;
 
                                     Email.send({
-    SecureToken : "ff7bbbb5-9dd3-4810-beb4-f477a60f7023",
-    To : 'kundeservice@oygardenfrisbee.no',
-    From : "systad99@gmail.com",
-    Subject : "contact message",
-    Body : "And this is the body"
-}).then(
-  message => alert(message)
-);
-                                });
+                                                SecureToken : "96bffc26-229a-414b-8ddc-1e2bdb119f66",
+                                                To : 'kundeservice@oygardenfrisbee.no',
+                                                From : "systad99@gmail.com",
+                                                Subject : "contact message",
+                                                Body : "And this is the body"
+                                            }).then(
+                                            message => alert(message)
+                                            );
+                                                });
 
 
                     
