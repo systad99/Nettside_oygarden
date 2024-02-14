@@ -146,6 +146,7 @@ https://templatemo.com/tm-585-barber-shop
                             <script src="https://smtpjs.com/v3/smtp.js">
                             </script>
                             <script>
+                                
                                 var btn = document.getElementById('btn');
                                 btn.addEventListener('click', function(e) {
                                     e.preventDefault();
@@ -154,21 +155,21 @@ https://templatemo.com/tm-585-barber-shop
                                     var subject = document.getElementById('subject').value;
                                     var message = document.getElementById('message').value;
                                     var body = 'Name: ' + name + '<br>Email: ' + email + '<br>Subject: ' + subject + '<br>Message: ' + message;
-
+                                    
                                     Email.send({
-                                                SecureToken : "96bffc26-229a-414b-8ddc-1e2bdb119f66",
-                                                To : 'kundeservice@oygardenfrisbee.no',
-                                                From : "systad99@gmail.com",
-                                                Subject : "contact message",
-                                                Body : "And this is the body"
-                                            }).then(
+                                            SecureToken : "96bffc26-229a-414b-8ddc-1e2bdb119f66", // Sett din sikre token her
+                                            Host : "smtp.elasticemail.com", // Sett SMTP-serveren din her
+                                            Username : "systad99@gmail.com", // Sett brukernavnet ditt her
+                                            Password : "ff7bbbb5-9dd3-4810-beb4-f477a60f7023", // Sett passordet ditt her
+                                            To : 'kundeservice@oygardenfrisbee.no',
+                                            From : "systad99@gmail.com",
+                                            Subject : "Kontaktskjema",
+                                            Body : body
+                                        }).then(
                                             message => alert(message)
-                                            );
-                                                });
-
-
-                    
-                                
+                                        );
+                                    });
+                                    
                             </script>
                         </div>
                         <div class="col-lg-6 col-12">
