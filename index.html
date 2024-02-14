@@ -307,45 +307,7 @@ https://templatemo.com/tm-585-barber-shop
                                 <div class="col-lg-12 col-12 mx-auto mt-5 pt-5">
                                     <iframe class="google-map" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2104.574949823341!2d7.667216677283256!3d58.16422140373099!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x46381f84f6355f0b%3A0x8a8f4943de258a94!2s%C3%98ygarden%20Frisbeegolf%20bane!5e0!3m2!1sno!2sno!4v1705247884808!5m2!1sno!2sno" width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                                 </div>
-                                <div class="col-lg-6 col-12">
-                                    <div class="container_form">
-                                        <form method="post">    
-                                            <h3 class="mb-4">Send oss en melding</h3>
-                                            <input type="text" id="name" placeholder="Ditt navn" required>
-                                            <input type="email" id="email" placeholder="Din Mail" required>
-                                            <input type="text" id="subject" placeholder="Emne" required>
-                                            <textarea id="message" rows="4" placeholder="Hvordan kan vi hjelpe deg" cols="30" rows="10"></textarea>
-                                            <button id="btn">Send</button>
-                                        </form>
-                                       
-                                    </div>
-                                </div>
-                                <script src="https://smtpjs.com/v3/smtp.js">
-                                    var btn = document.getElementById('btn');
-                                    btn.addEventListener('click', function(e) {
-                                        e.preventDefault();
-                                        var name = document.getElementById('name').value;
-                                        var email = document.getElementById('email').value;
-                                        var subject = document.getElementById('subject').value;
-                                        var message = document.getElementById('message').value;
-                                        var body = 'Name: ' + name + '<br>Email: ' + email + '<br>Subject: ' + subject + '<br>Message: ' + message;
-    
-                                        Email.send({
-                                                    SecureToken : "96bffc26-229a-414b-8ddc-1e2bdb119f66",
-                                                    To : 'kundeservice@oygardenfrisbee.no',
-                                                    From : "systad99@gmail.com",
-                                                    Subject : "contact message",
-                                                    Body : "And this is the body"
-                                                }).then(
-                                                message => alert(message)
-                                                );
-                                                    });
-    
-    
-                        
-                                    
-                                </script>
-                            </div>
+                                
                             </div>
                         </div>
                     </div>
