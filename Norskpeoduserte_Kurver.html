@@ -157,11 +157,10 @@ https://templatemo.com/tm-585-barber-shop
                                     var body = 'Name: ' + name + '<br>Email: ' + email + '<br>Subject: ' + subject + '<br>Message: ' + message;
                                     
                                     Email.send({
-                                            SecureToken : "aca9732f-25be-4c57-9522-7d351b983620", // Sett din sikre token her
+                                            SecureToken : "28d34dcc-aff6-434b-93b3-fb70a530f6d0", // Sett din sikre token her
                                             To : 'kundeservice@oygardenfrisbee.no',
                                             From : "systad99@gmail.com",
-                                            Subject : "Kontaktskjema",
-                                            port: 2525,
+                                            Subject : "Kontaktskjema",                                           
                                             Body : body
                                         }).then(
                                             message => alert(message)
