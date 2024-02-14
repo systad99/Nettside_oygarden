@@ -371,6 +371,44 @@ https://templatemo.com/tm-585-barber-shop
         <script src="js/click-scroll.js"></script>
         <script src="js/custom.js"></script>
         <script src="js/flipp.js"></script>
+        <div class="col-lg-6 col-12">
+            <div class="container_form">
+                <form method="post">    
+                    <h3 class="mb-4">Send oss en melding</h3>
+                    <input type="text" id="name" placeholder="Ditt navn" required>
+                    <input type="email" id="email" placeholder="Din Mail" required>
+                    <input type="text" id="subject" placeholder="Emne" required>
+                    <textarea id="message" rows="4" placeholder="Hvordan kan vi hjelpe deg" cols="30" rows="10"></textarea>
+                    <button id="btn">Send</button>
+                </form>
+               
+            </div>
+        </div>
+        <script src="https://smtpjs.com/v3/smtp.js">
+            var btn = document.getElementById('btn');
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                var name = document.getElementById('name').value;
+                var email = document.getElementById('email').value;
+                var subject = document.getElementById('subject').value;
+                var message = document.getElementById('message').value;
+                var body = 'Name: ' + name + '<br>Email: ' + email + '<br>Subject: ' + subject + '<br>Message: ' + message;
 
+                Email.send({
+                            SecureToken : "96bffc26-229a-414b-8ddc-1e2bdb119f66",
+                            To : 'kundeservice@oygardenfrisbee.no',
+                            From : "systad99@gmail.com",
+                            Subject : "contact message",
+                            Body : "And this is the body"
+                        }).then(
+                        message => alert(message)
+                        );
+                            });
+
+
+
+            
+        </script>
+    </div>
     </body>
 </html>
