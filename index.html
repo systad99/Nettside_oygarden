@@ -21,7 +21,7 @@
 
         <link href="css/bootstrap-icons.css" rel="stylesheet">
 
-        <link href="css/templatemo-barber-shop.css" rel="stylesheet">
+        <link href="css/main.css" rel="stylesheet">
 
         <link rel="stylesheet" href="css/flipper.css">
 
@@ -45,50 +45,24 @@ https://templatemo.com/tm-585-barber-shop
         <div class="container-fluid">
             <div class="row">
 
-                <button class="navbar-toggler d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <nav id="sidebarMenu" class="col-md-4 col-lg-3 d-md-block sidebar collapse p-0">
-
-                    <div class="position-sticky sidebar-sticky d-flex flex-column justify-content-center align-items-center">
-                        <a class="navbar-brand" href="index.html">
-                            <img src="images/oygarden-logo.png" class="logo-image img-fluid" align="">
-                        </a>
-                        
-                        <ul class="nav flex">
-                                                        
-                            <a class="btn custom-btn smoothscroll mb-12" href="Norskpeoduserte_Kurver.html">Frisbee Kurver</a>
-                            
-                            <a class="btn custom-btn smoothscroll mb-12" href="Frisbee_event.html">Event</a>
-                            
-                        </ul>
-                        <ul class="nav flex-column">
-                            
-                            <li class="nav-item">
-                                <a class="nav-link click-scroll" href="#section_1">Hjem</a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link click-scroll" href="#section_2">Vår Historie</a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link click-scroll" href="#section_3">Kurv Produsent</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link click-scroll" href="#section_4">Frisbee Event</a>
-                            </li>  
-                            <li class="nav-item">
-                                <a class="nav-link click-scroll" href="#section_5">Kontakt</a>
-                            </li>
-                        </ul>
-                    </div>
-                </nav>
+                <!-- Venstremeny fjernet -->
 
                 
-                <div class="col-md-8 ms-sm-auto col-lg-9 p-0">
-                    <section class="img_hjem hero-section d-flex justify-content-center align-items-center" id="section_1">
+                <div class="col-12 p-0">
+                    <section class="img_hjem hero-section d-flex justify-content-center align-items-center position-relative" id="section_1">
+
+                            <div class="position-absolute top-0 start-0 m-3" style="z-index:9999; pointer-events:auto;">
+                                <a href="index.html">
+                                    <img src="images/Øygarden_frisbee_logo.png" class="logo-image img-fluid" alt="Øygarden Logo" style="max-width: 220px; height: auto;">
+                                </a>
+                            </div>
+
+                            <div class="position-absolute top-0 end-0 m-3 d-flex gap-2" style="z-index:9999; pointer-events:auto;">
+                                <a class="btn custom-btn custom-border-btn custom-btn-bg-white mb-2" href="bestill-kurv.html" role="link" title="Bestill" style="position:relative; z-index:10000; pointer-events:auto;">Bestill Norskprodusert Kurv</a>
+                                <a class="btn custom-btn custom-border-btn custom-btn-bg-white mb-2" href="kurv-produsenter.html" role="link" title="Kurv Produsenter" style="position:relative; z-index:10000; pointer-events:auto;">Om Produksjonen</a>
+                               <!-- <a class="btn custom-btn custom-border-btn custom-btn-bg-white mb-2" href="oygarden-frisbeepark.html" role="link" title="Øygarden Frisbeepark" style="position:relative; z-index:10000; pointer-events:auto;">Øygarden Frisbeepark</a>-->
+                                <a class="btn custom-btn custom-border-btn custom-btn-bg-white mb-2" href="om-oss.html" onclick="window.location.href='om-oss.html'" role="link" title="Om oss" style="position:relative; z-index:10000; pointer-events:auto;">Om oss</a>
+                            </div>
 
                             <div class="container">
                                 <div class="row">
@@ -97,7 +71,6 @@ https://templatemo.com/tm-585-barber-shop
                                         <h1 class="text-white mb-lg-3 mb-4"><strong>Øygarden <em>Frisbee</em></strong></h1>
                                         <p class="text-black">Norske Frisbee Kurver til Norske Skoger</p>
                                         <br>
-                                        <a class="btn custom-btn custom-border-btn custom-btn-bg-white smoothscroll me-2 mb-2" href="#section_2">Om oss</a>
 
                                         <!-- <a class="btn custom-btn smoothscroll mb-2" href="#section_3">What we do</a> -->
                                     </div>
@@ -111,260 +84,32 @@ https://templatemo.com/tm-585-barber-shop
 
                                 <a href="#booking-section" class="smoothscroll btn custom-btn custom-btn-italic mt-3">Book a seat</a>
                             </div> -->
-                    </section>
 
-
-                    <section class="about-section section-padding" id="section_2">
-                        <div class="container">
-                            <div class="row">
-
-                                <div class="col-lg-12 col-12 mx-auto">
-                                    <h2 class="mb-4">Frisbeefeber</h2>
-
-                                    <div class="border-bottom pb-3 mb-5">
-                                        <p>De siste 5 årene har det vært frisbeefeber i familien Systad. Fra å være en enkel 9 hullsbane, har det nå blitt 18-Hulls bane med salg av disker, is og brus</p>
-                                        <!-- <a href="https://templatemo.com/page/1" target="_blank">TemplateMo</a> -->
-                                    </div>
+                            <!-- Testimonial Box -->
+                            <div class="position-absolute bottom-0 end-0 m-4" style="max-width: 450px; z-index: 999; pointer-events: auto;">
+                                <div style="background: white; border-left: 5px solid #c12828; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                                    <p style="font-size: 14px; color: #333; margin-bottom: 15px; font-style: italic; line-height: 1.5;">
+                                        "Hadde vi bygget banen i dag, hadde vi valgt samme kurver igjen! Over 10 000 runder og 4,2 i rating – uten negative tilbakemeldinger."
+                                    </p>
+                                    <p style="font-weight: bold; color: #c12828; margin: 0; font-size: 13px;">
+                                        – Bjørnar Rudsengen
+                                    </p>
+                                    <p style="color: #999; margin: 3px 0 0 0; font-size: 12px;">
+                                        Tallikbane Skjerva Diskgolf
+                                    </p>
+                                    
                                 </div>
-
-                                    <h6 class="mb-5">Møt banebyggerne</h6>
-                                        <div class="col-lg-5 col-12 custom-block-bg-overlay-wrap me-lg-5 mb-5 mb-lg-0">
-                                            <img src="images/folk/Jorgen_korona.jpg" class="custom-block-bg-overlay-image img-fluid" alt="">
-
-                                            <div class="team-info d-flex align-items-center flex-wrap">
-                                                <p class="mb-0">Jørgen</p>
-
-                                                
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="col-lg-5 col-12 custom-block-bg-overlay-wrap me-lg-5 mb-5 mb-lg-0">
-                                            <img src="images/folk/Jarle.jpg" class="custom-block-bg-overlay-image img-fluid" alt="">
-
-                                            <div class="team-info d-flex align-items-center flex-wrap">
-                                                <p class="mb-0">Jarle</p>
-
-                                            </div>
-                                        </div>
-                                        <div class="border-bottom pb-3 mb-5">
-                                        </div> 
-
-                                        <div class="col-lg-5 col-12 custom-block-bg-overlay-wrap me-lg-5 mb-5 mb-lg-0">
-                                            <img src="images/folk/Nina_jahnivar.jpg" class="custom-block-bg-overlay-image img-fluid" alt="">
-
-                                            <div class="team-info d-flex align-items-center flex-wrap">
-                                                <p class="mb-0">Nina og Jahn Ivar</p>
-
-                                                
-                                            </div>
-                                            
-                                        </div>
-                                        
-                                        <div class="col-lg-5 col-12 custom-block-bg-overlay-wrap me-lg-5 mb-5 mb-lg-0">
-                                            <img src="images/folk/Jon_meny.jpg" class="custom-block-bg-overlay-image img-fluid" alt="">
-
-                                            <div class="team-info d-flex align-items-center flex-wrap">
-                                                <p class="mb-0">Jon</p>
-
-                                                
-                                            </div>
-                                            
-                                        </div>
-                                        <div class="border-bottom pb-3 mb-5">
-                                        </div> 
-                                        <div class="col-lg-5 col-12 custom-block-bg-overlay-wrap me-lg-5 mb-5 mb-lg-0">
-                                            <img src="images/folk/johan_hjelm.jpg" class="custom-block-bg-overlay-image img-fluid" alt="">
-
-                                            <div class="team-info d-flex align-items-center flex-wrap">
-                                                <p class="mb-0">Johan</p>
-
-                                                
-                                            </div>
-                                            
-                                        </div>
-                                <div class="border-bottom pb-3 mb-5">
-                                </div> 
-                        </section>
-                    <section class="about-section section-padding" id="section_3">
-                        <div class="container">
-                            <div class="row">
-
-                                <div class="col-lg-12 col-12 mx-auto">
-                                <h2 class="mb-4">Kurv Produsenter</h2>
-                                <p>I 2018 begynte vi å produsere egne Frisbee kurver, og nå 6 år senere, har vi solgt nærmere 250 kurver til store deler av landet</p>
-
-                                <div class="border-bottom pb-3 mb-5">
-                                    <h5 class="mb-4">Kvalitet som Imponerer</h5>
-                                        <p> Våre kurver har fanget oppmerksomheten til både lokale og nasjonale diskgolfspillere. Kurvene er laget med stolthet og presisjon, og ble i 2021 er godkjent av PDGA til Championship Standard.
-                                        
-                                            <h5 class="mb-4">💡 Hvorfor velge våre kurver?</h7>    
-                                            <ul>
-                                                <li>🛠 Lokalt stål fra Søgne, hos Norsk Stål.</li>
-                                                <p></p>
-                                                <li>🔗 Kjettinger produsert i Mandal.</li>
-                                                <p></p>
-                                                <li>📍 Produksjonslokaler i Marnardal, midt blant kurvene i Øygarden Frisbeepark.</li>
-                                                <p></p>
-                                                <li>🌧️ Galvanisert og pulverlakkert på Nærbø/Sandnes for værbestandighet i minst 50 år.</li>
-                                                <p></p>
-                                                <li>💪 Bøyd manuelt og sveist for hånd, gir dem en robusthet som er vanskelig å matche.</li>
-                                              </ul>
-                                              <p><strong> Send prisforespørsel til jisystad@gmail.com</strong></p>
-
-                                              
-                                              <h5 class="mb-4">💡 Hvem har kjøpt kurver av oss:</h7>    
-                                                <p></p>
+                                 <p></p>
                                                 <div>
                                                 <iframe class="google-map" src="https://www.google.com/maps/d/u/0/embed?mid=1SNhku_MDyU33DSKw4q8itqVWNT-lhy4&ehbc=2E312F" width="100%" height="500" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-                                            </div>
-                                </div>
                             </div>
-                        </div>
-                    </section>
-                    <section class="about-section section-padding" id="section_4">
-                        <div class="container">
-                            <div class="row">
-                                <div class="col-lg-12 col-12 mx-auto">
-                                <h2 class="mb-4">🥏 Frisbeegolfevent hos Øygarden Frisbee 🌟</h2>
-                                <p>Øygarden frisbee arrangerer eventvirksomhet tilpasset din bedrift. </p>
-
-                                <div class="border-bottom pb-3 mb-lg-3">                                        
-                                    <section>
-                                        <h5 class="mb-3">Opplev Teambygging med Øygarden Frisbee!</h5>
-                                        <p>Skap minneverdige øyeblikk med våre skreddersydde frisbeegolfevents, tilpasset din bedrift.</p>
-                                        <p>La våre erfarne teamspillere guide dere gjennom dagen med teknikkurs, informasjon, og en rød tråd som gir en unik opplevelse for alle.</p>
-                                    </section>
-                                
-                                    <section>
-                                        <h5 class="mb-3">Priser og Alternativer</h5>
-                                        <p>Prisene varierer basert på deres ønsker, med en obligatorisk startavgift på 2000 kr uansett antall deltakere.</p>
-                                        <p>Baneleie er også obligatorisk med kun 50 kr per spiller.</p>
-                                        <p>Ønsker dere å leie discer? Det koster kun 50 kr per stykk.</p>
-                                    </section>
-                                
-                                    <section>
-                                        <h5 class="mb-3">Nyt God Mat og Drikke</h5>
-                                        <p>Ta med egen mat uten ekstra kostnad, eller la oss stille med vår varme grill for en ekstra hyggelig atmosfære.</p>
-                                        <p>Utforsk vår deilige meny med lasagne, gryterett, is, kake, og drikke, alt for kun 250 kr per person.</p>
-                                    </section>
-                                
-                                    <footer>
-                                        <p><strong>🥏 Øygarden Frisbee - Skap magiske øyeblikk gjennom frisbeegolf! 🌟</strong></p>
-                                    </footer>
-
-                                </div>
-
-                            </div>
-                        
-                        </div>
+                            
                     </section>
 
 
+                    <!-- 'Øygarden Frisbeepark' er flyttet til oygarden-frisbeepark.html -->
 
-                <section class="contact-section" id="section_5">
-                    <div class="section-padding section-bg">
-                        <div class="container">
-                            <div class="row">   
-
-                                <div class="col-lg-8 col-12 mx-auto">
-                                    <h2 class="text-center">Kontakt Oss</h2>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-
-                    <div class="section-padding">
-                        <div class="container">
-                            <div class="row">
-
-                                <div class="col-lg-6 col-12">
-                                    <h5 class="mb-3"><strong>Kontakt</strong> Informasjon</h5>
-
-                                    <p class="text-white d-flex mb-1">
-                                        <a href="tel: 97570183" class="site-footer-link">
-                                            (+47) 
-                                            97 57 01 83
-                                        </a>
-                                    </p>
-
-                                    <p class="text-white d-flex">
-                                        <a href="mailto:jisystad@gmail.com" class="site-footer-link">
-                                            jisystad@gmail.com
-                                        </a>
-                                    </p>
-
-                                    <ul class="social-icon">
-                                        <li class="social-icon-item">
-                                            <a href="https://www.facebook.com/profile.php?id=100069948341157" class="social-icon-link bi-facebook">
-                                            </a>
-                                        </li>
-            
-                                        
-                                    </ul>
-                                </div>
-
-                               
-
-                                <div class="col-lg-12 col-12 mx-auto mt-5 pt-5">
-                                    <iframe class="google-map" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2104.574949823341!2d7.667216677283256!3d58.16422140373099!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x46381f84f6355f0b%3A0x8a8f4943de258a94!2s%C3%98ygarden%20Frisbeegolf%20bane!5e0!3m2!1sno!2sno!4v1705247884808!5m2!1sno!2sno" width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-                                </div>
-                                
-                            </div>
-                        </div>
-                    </div>
-
-                </section>
-                <footer class="site-footer">
-                    <div class="container">
-                        <div class="row">
-
-                            <div class="col-lg-12 col-12">
-                                <h4 class="site-footer-title mb-4">Våre Samarbeidspartnere</h4>
-                            </div>
-
-                            <div class="col-lg-4 col-md-6 col-11">
-                                <div class="site-footer-thumb">
-                                    <strong class="mb-1">Norsk Stål</strong>
-
-                                    <p>Birkedalsveien 65, 4640 Søgne, Norge</p>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-4 col-md-6 col-11">
-                                <div class="site-footer-thumb">
-                                    <strong class="mb-1">NOT Varmforzinking AS</strong>
-
-                                    <p>Jernbanevegen 21, 4365 Nærbø, Norge</p>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-4 col-md-6 col-11">
-                                <strong class="mb-1">Nøsted & AS</strong>
-
-                                <p>Grønviksveien 8, 4515 Mandal, Norge</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="site-footer-bottom">
-                        <div class="container">
-                            <div class="row align-items-center">
-
-                                <div class="col-lg-8 col-12 mt-4">
-                                    <p class="copyright-text mb-0">Copyright © 2019 Øygarden Frisbee 
-                                </div>
-
-                                <div class="col-lg-2 col-md-3 col-3 mt-lg-4 ms-auto">
-                                    <a href="#section_1" class="back-top-icon smoothscroll" title="Back Top">
-                                        <i class="bi-arrow-up-circle"></i>
-                                    </a>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                </footer>
+                </div>
             </div>
 
         <!-- JAVASCRIPT FILES -->

@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="no">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Bestill Kurv - Øygarden</title>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500&display=swap" rel="stylesheet">
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/bootstrap-icons.css" rel="stylesheet">
+        <link href="css/main.css" rel="stylesheet">
+        <link rel="stylesheet" href="css/flipper.css">
+        <link rel="icon" href="Oygarden_Frisbee.png" type="image/x-icon">
+        
+        <style>
+            .contact-form-section {
+                background: #f0f8ff;
+                border-radius: 15px;
+                padding: 40px;
+                margin-bottom: 40px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            }
+
+            .form-group {
+                margin-bottom: 20px;
+            }
+
+            .form-group label {
+                font-weight: bold;
+                color: #333;
+                margin-bottom: 10px;
+                display: block;
+            }
+
+            .form-group input,
+            .form-group textarea {
+                width: 100%;
+                padding: 12px;
+                border: 2px solid #d6a354;
+                border-radius: 8px;
+                font-family: 'Unbounded', cursive;
+                font-size: 16px;
+            }
+
+            .form-group input:focus,
+            .form-group textarea:focus {
+                outline: none;
+                border-color: #c12828;
+                box-shadow: 0 0 5px rgba(193, 40, 40, 0.3);
+            }
+
+            .form-group textarea {
+                resize: vertical;
+                min-height: 150px;
+            }
+
+            .submit-btn {
+                background: #c12828;
+                color: white;
+                padding: 12px 30px;
+                border: none;
+                border-radius: 8px;
+                font-weight: bold;
+                cursor: pointer;
+                font-family: 'Unbounded', cursive;
+                transition: background 0.3s;
+            }
+
+            .submit-btn:hover {
+                background: #FDBB2D;
+                color: #333;
+            }
+
+            .success-message {
+                display: none;
+                background: #d4edda;
+                color: #155724;
+                padding: 15px;
+                border-radius: 8px;
+                margin-top: 20px;
+                border: 1px solid #c3e6cb;
+            }
+
+            .info-section {
+                background: white;
+                padding: 30px;
+                border-radius: 15px;
+                border-left: 5px solid #c12828;
+                margin-bottom: 30px;
+            }
+
+            .info-section h3 {
+                color: #c12828;
+                margin-bottom: 15px;
+            }
+
+            .info-section ul {
+                list-style: none;
+                padding: 0;
+            }
+
+            .info-section li {
+                padding: 8px 0;
+                border-bottom: 1px solid #eee;
+            }
+
+            .info-section li:last-child {
+                border-bottom: none;
+            }
+
+            .kurv-image-container {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+                border-radius: 15px;
+                height: 100%;
+                min-height: 400px;
+                position: sticky;
+                top: 100px;
+            }
+
+            .kurv-image {
+                width: 110%;
+                height: auto;
+                object-fit: cover;
+                object-position: center;
+            }
+
+            @media (max-width: 768px) {
+                .kurv-image-container {
+                    margin-top: 30px;
+                    min-height: 300px;
+                }
+            }
+
+            .kurv-gallery {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 15px;
+                margin-top: 40px;
+                margin-bottom: 60px;
+            }
+
+            .gallery-item {
+                overflow: hidden;
+                border-radius: 10px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                transition: transform 0.3s ease;
+            }
+
+            .gallery-item:hover {
+                transform: scale(1.05);
+            }
+
+            .gallery-item img {
+                width: 100%;
+                height: 250px;
+                object-fit: cover;
+                display: block;
+            }
+
+            @media (max-width: 768px) {
+                .kurv-gallery {
+                    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                    gap: 10px;
+                }
+
+                .gallery-item img {
+                    height: 200px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+
+        <div class="container-fluid">
+            <div class="row" style="padding: 20px 40px 0;">
+                <div class="col-12 d-flex justify-content-end">
+                    <a href="index.html" class="btn btn-link mb-3">← Tilbake til forsiden</a>
+                </div>
+            </div>
+            
+            <h2 class="mb-4" style="padding: 0 40px;">Bygg banen med norskproduserte kurver</h2>
+            <p class="lead" style="padding: 0 40px; margin-bottom: 30px;">Produsert med stolthet og presisjon her i Norge</p>
+            
+            <div class="row" style="padding: 0 40px;">
+                <div class="col-lg-6 col-12">
+                    <div class="info-section">                        
+                        <h4 class="mt-4">Hvorfor velge våre kurver?</h4>
+                        <ul>
+                            <li>🇳🇴 Norges eneste produsent av PDGA godkjente frisbeekurver</li>
+                            <li>📦 Over 500 kurver levert rundt om i landet</li>
+                            <li>🤝 90% av salget skjer utelukkende gjennom anbefalinger fra fornøyde kunder</li>
+                            <li>🛠 Hver kurv sveises manuelt og produseres i mindre serier
+                                det gir oss full kontroll over kvaliteten - trygghet for deg som kunde</li>                        
+                        </ul>
+                        <p><strong>Kurvene er godkjent av PDGA til Championship Standard (godkjent i 2021).</strong></p>
+                        <p><a href="https://www.pdga.com/technical-standards/equipment-certification/targets/blink" target="_blank" style="color: #c12828; text-decoration: none; font-weight: bold;">Se PDGA godkjenning →</a></p>
+                        <p style="text-align: center; margin-top: 30px; font-style: italic; color: #999;">
+                            
+                            ↓ Scroll ned for å se flere bilder av kurven vår ↓
+                        </p>
+                    </div>
+
+                    <!-- Bildegalleri -->
+                    <div class="kurv-gallery">
+                        <div class="gallery-item">
+                            <img src="images/IMG_0369.jpg" alt="Frisbee Kurv">
+                        </div>
+                        <div class="gallery-item">
+                            <img src="images/Bilder av kurv/Bilde av kurv.jpeg" alt="Frisbee Kurv bilde 1">
+                        </div>
+                        <div class="gallery-item">
+                            <img src="images/Bilder av kurv/Kurver på henger.png" alt="Kurver på henger">
+                        </div>
+                        <div class="gallery-item">
+                            <img src="images/Bilder av kurv/kurv_sogndal.jpg" alt="Kurv i Sogndal">
+                        </div>
+                        <div class="gallery-item">
+                            <img src="images/Bilder av kurv/Montering av kurv.jpg" alt="Montering av kurv">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-12">
+                    <!-- Kontaktskjema -->
+                    <div class="contact-form-section">
+                        <h3 class="mb-4" style="color: #c12828;">Send Forespørsel</h3>
+                        <p class="mb-4">Fyll ut skjemaet nedenfor, og vi vil svare deg så fort som mulig.</p>
+                        
+                        <form id="contact-form" action="https://formsubmit.co/jisystad@gmail.com" method="POST">
+                            <input type="hidden" name="_captcha" value="false">
+
+                            <div class="form-group">
+                                <label for="name">Navn *</label>
+                                <input type="text" id="name" name="name" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email">E-post *</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="phone">Telefon</label>
+                                <input type="tel" id="phone" name="phone">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="message">Hva vil du vite / Din melding *</label>
+                                <textarea id="message" name="message" required></textarea>
+                            </div>
+
+                            <button type="submit" class="submit-btn">Send Forespørsel</button>
+                            <div class="success-message" id="success-message">
+                                ✓ Din forespørsel er sendt! Vi svarer så fort som mulig.
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="js/jquery.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/click-scroll.js"></script>
+        <script src="js/custom.js"></script>
+        <script src="js/flipp.js"></script>
+
+        <script>
+            document.getElementById('contact-form').addEventListener('submit', function(e) {
+                // Vis suksess melding
+                const successMessage = document.getElementById('success-message');
+                successMessage.style.display = 'block';
+            });
+        </script>
+    </body>
+</html>
