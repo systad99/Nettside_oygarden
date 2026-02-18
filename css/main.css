@@ -208,15 +208,28 @@
   }
 }
 /* Responsivt bakgrunnsbilde for hero-section */
+/* HERO bakgrunnsbilde: dekker alltid, men tilpass på små skjermer */
 .hero-section {
   background-image: url('images/kurv_sogndal.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  background-attachment: scroll;
 }
 @media (min-width: 900px) {
   .hero-section {
     background-image: url('images/bedriftevent.jpg');
+  }
+}
+
+@media (max-width: 700px) {
+  .hero-section {
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center top;
+    background-attachment: scroll;
+    min-height: 60vw;
+    padding-top: 32vw;
   }
 }
 /* Testimonial-boks til venstre og responsiv nedover */
@@ -654,11 +667,9 @@ strong {
 }
 
 /* Common styles for all hero sections */
+
 .hero-section {
   background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-size: 100% auto;
-  background-position: center;
   position: relative;
   overflow: hidden;
   padding: 50px;
