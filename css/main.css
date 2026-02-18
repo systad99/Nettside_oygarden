@@ -1,3 +1,207 @@
+/* Slogan section styling */
+.slogan-hero {
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin-top: 1.5rem;
+  margin-right: 1.5rem;
+  z-index: 1001;
+}
+.slogan-text {
+  color: #c12828;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-align: right;
+  font-size: clamp(1.7rem, 4vw, 2.7rem);
+  margin-bottom: 0;
+  background: rgba(255,255,255,0.0);
+  padding: 0.2em 0.7em;
+  font-family: 'Montserrat', Arial, sans-serif;
+  text-shadow: 0 2px 8px rgba(255,255,255,0.7);
+}
+@media (max-width: 700px) {
+  .slogan-hero {
+    position: static;
+    margin: 1rem 0 0 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  .slogan-text {
+    text-align: center;
+    font-size: 1.2rem;
+    padding: 0.2em 0.5em;
+  }
+}
+/* Fjern glipe/linje mellom hero-sections */
+.hero-section {
+  margin-bottom: 0 !important;
+  border: none !important;
+}
+/* Felles flex-container for logo og navigasjon i hero */
+.hero-headerbar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1rem 0 0 0;
+  margin-bottom: 1.5rem;
+}
+.hero-headerbar .logo-link {
+  min-width: 100px;
+  flex-shrink: 0;
+}
+.hero-headerbar .logo-image {
+  max-width: clamp(100px, 22vw, 220px);
+  height: auto;
+}
+.hero-headerbar .hero-nav {
+  flex: 1 1 180px;
+  min-width: 180px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  align-items: center;
+}
+@media (max-width: 700px) {
+  .hero-headerbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.5rem 0 0 0;
+  }
+  .hero-headerbar .hero-nav {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 0.5rem;
+  }
+}
+/* Usynlig boks for logo for å reservere plass */
+.logo-container {
+  min-width: 120px;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  background: transparent;
+}
+@media (max-width: 600px) {
+  .logo-container {
+    min-width: 80px;
+    min-height: 40px;
+  }
+}
+/* Responsivt bakgrunnsbilde for hero-section */
+.hero-section {
+  background-image: url('images/kurv_sogndal.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+@media (min-width: 900px) {
+  .hero-section {
+    background-image: url('images/bedriftevent.jpg');
+  }
+}
+/* Testimonial-boks til venstre og responsiv nedover */
+@media (max-width: 991px) {
+  .testimonial-box-responsive {
+    right: 0 !important;
+    left: 0 !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    bottom: 0 !important;
+    top: auto !important;
+    position: static !important;
+    display: block !important;
+    max-width: 98vw;
+    margin-top: 24px !important;
+  }
+}
+/* Sikre at hero-section og testimonial-boks ikke går over headeren */
+.main-header {
+  position: sticky;
+  top: 0;
+  z-index: 1050;
+  min-height: clamp(60px, 12vw, 110px);
+}
+.hero-section {
+  padding-top: clamp(30px, 6vw, 60px) !important;
+  padding-bottom: clamp(20px, 5vw, 40px) !important;
+  min-height: 40vh;
+}
+/* Testimonial-boks uten intern scroll */
+.testimonial-box-responsive {
+  max-width: clamp(220px, 38vw, 450px);
+  width: 100%;
+}
+@media (max-width: 600px) {
+  .testimonial-box-responsive {
+    max-width: 98vw;
+    right: 0;
+    left: 0;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    max-height: calc(100vh - clamp(70px, 13vw, 120px) - 16px);
+  }
+}
+/* Responsiv testimonial-boks */
+.testimonial-box-responsive {
+  max-width: clamp(220px, 38vw, 450px);
+  width: 100%;
+}
+.testimonial-inner-responsive {
+  padding: clamp(10px, 4vw, 20px);
+}
+@media (max-width: 600px) {
+  .testimonial-box-responsive {
+    max-width: 98vw;
+    right: 0;
+    left: 0;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
+/* Øygarden Frisbee Header Custom Styles */
+.main-header {
+  background: rgba(255,255,255,0.97);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  position: sticky;
+  top: 0;
+  z-index: 1050;
+  min-height: clamp(60px, 12vw, 110px);
+}
+.main-header .logo-image {
+  max-width: 180px;
+  width: 100%;
+  height: auto;
+}
+.header-nav .btn {
+  font-size: clamp(12px, 2.5vw, 16px);
+  padding: clamp(8px, 1.5vw, 12px) clamp(10px, 2vw, 16px);
+  margin-bottom: 0;
+}
+@media (max-width: 767px) {
+  .main-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    min-height: 60px;
+  }
+  .main-header .logo-image {
+    max-width: 130px;
+    margin-bottom: 6px;
+  }
+  .header-nav {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 0.5rem;
+  }
+}
 /*
 
 TemplateMo 585 Barber Shop
