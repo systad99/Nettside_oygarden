@@ -19,7 +19,7 @@
         <div class="container">
             <div class="row mt-5">
                 <div class="col-12">
-                    <a href="index.html" class="btn btn-link mb-3">← Tilbake til forsiden</a>
+                    <a href="index.html" class="btn btn-link tilbake-forsiden">← Hjem</a>
                     <section class="about-section section-padding" id="section_3">
                         <div class="container">
                             <div class="row">
@@ -63,6 +63,36 @@
                 </div>
             </div>
         </div>
+
+                                <style>
+                                .tilbake-forsiden {
+                                    position: fixed;
+                                    top: 1.2rem;
+                                    right: 1.2rem;
+                                    z-index: 2000;
+                                    background: #fff;
+                                    color: #c12828 !important;
+                                    border-radius: 8px;
+                                    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+                                    font-weight: 600;
+                                    padding: 0.6em 1.2em;
+                                    text-decoration: none;
+                                    border: 1px solid #c12828;
+                                    transition: background 0.2s, color 0.2s;
+                                }
+                                .tilbake-forsiden:hover {
+                                    background: #c12828;
+                                    color: #fff !important;
+                                }
+                                @media (max-width: 700px) {
+                                    .tilbake-forsiden {
+                                        font-size: 1rem;
+                                        padding: 0.5em 1em;
+                                        top: 0.7rem;
+                                        right: 0.7rem;
+                                    }
+                                }
+                                </style>
 
         <script src="js/jquery.min.js"></script>
         <script src="js/bootstrap.min.js"></script>

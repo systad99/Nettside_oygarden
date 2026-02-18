@@ -1,3 +1,31 @@
+/* Forhindre overlapping mellom hamburger og tilbake-knapp på mobil */
+.tilbake-forsiden {
+  position: fixed;
+  top: 1.2rem;
+  right: 1.2rem;
+  z-index: 2000;
+  background: #fff;
+  color: #c12828 !important;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  font-weight: 600;
+  padding: 0.6em 1.2em;
+  text-decoration: none;
+  border: 1px solid #c12828;
+  transition: background 0.2s, color 0.2s;
+}
+.tilbake-forsiden:hover {
+  background: #c12828;
+  color: #fff !important;
+}
+@media (max-width: 700px) {
+  .tilbake-forsiden {
+    font-size: 1rem;
+    padding: 0.5em 1em;
+    top: 4.2rem; /* Flytt lenger ned på mobil */
+    right: 0.7rem;
+  }
+}
 /* Hamburger og bestill-knapp responsiv stil */
 @media (max-width: 700px) {
   .btn.custom-btn.d-md-block {
@@ -25,12 +53,18 @@
   margin: 5px 0;
   border-radius: 2px;
 }
-#bestill-dropdown {
+.hamburger-overlay {
   display: none;
-  position: absolute;
-  top: 3.5rem;
-  right: 1.2rem;
-  z-index: 22;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.95);
+  z-index: 9999;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
  .hero-topbar {
    display: flex;

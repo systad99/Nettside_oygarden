@@ -56,20 +56,42 @@ https://templatemo.com/tm-585-barber-shop
                             <span style="display:block; width:28px; height:4px; background:#c12828; margin:5px 0; border-radius:2px;"></span>
                             <span style="display:block; width:28px; height:4px; background:#c12828; margin:5px 0; border-radius:2px;"></span>
                         </button>
-                        <div id="bestill-dropdown" style="display:none; position:absolute; top:3.5rem; right:1.2rem; z-index:22;">
-                            <a class="btn custom-btn" href="bestill-kurv.html" role="link" title="Bestill">Bestill Norskprodusert Kurv</a>
+                        <div id="hamburger-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.95); z-index:9999; flex-direction:column; align-items:center; justify-content:center;">
+                            <nav style="width:100%; max-width:400px; margin:auto;">
+                                <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:2rem; align-items:center;">
+                                    <li><a class="btn custom-btn" href="index.html" style="font-size:2rem; color:white; background:#c12828; border:none; width:100%;">Hjem</a></li>
+                                    <li><a class="btn custom-btn" href="bestill-kurv.html" style="font-size:2rem; color:white; background:#c12828; border:none; width:100%;">Bestill kurv</a></li>
+                                    <li><a class="btn custom-btn" href="kurv-produsenter.html" style="font-size:2rem; color:white; background:#c12828; border:none; width:100%;">Produsenter</a></li>
+                                    <li><a class="btn custom-btn" href="oygarden-frisbeepark.html" style="font-size:2rem; color:white; background:#c12828; border:none; width:100%;">Frisbeepark</a></li>
+                                    <li><a class="btn custom-btn" href="om-oss.html" style="font-size:2rem; color:white; background:#c12828; border:none; width:100%;">Om oss</a></li>
+                                    <li><button id="close-hamburger-overlay" style="font-size:1.5rem; color:#fff; background:none; border:none; margin-top:2rem;">Lukk ✕</button></li>
+                                </ul>
+                            </nav>
                         </div>
         <script>
         document.addEventListener('DOMContentLoaded', function() {
             var hamburger = document.getElementById('bestill-hamburger');
-            var dropdown = document.getElementById('bestill-dropdown');
-            if(hamburger) {
+            var overlay = document.getElementById('hamburger-overlay');
+            var closeBtn;
+            if(hamburger && overlay) {
                 hamburger.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+                    overlay.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                    closeBtn = document.getElementById('close-hamburger-overlay');
+                    if(closeBtn) {
+                        closeBtn.onclick = function() {
+                            overlay.style.display = 'none';
+                            document.body.style.overflow = '';
+                        };
+                    }
                 });
-                document.addEventListener('click', function(e) {
-                    if(dropdown.style.display === 'block') dropdown.style.display = 'none';
+                // Lukk overlay hvis man klikker utenfor menyen
+                overlay.addEventListener('click', function(e) {
+                    if(e.target === overlay) {
+                        overlay.style.display = 'none';
+                        document.body.style.overflow = '';
+                    }
                 });
             }
         });
