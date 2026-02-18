@@ -53,16 +53,24 @@ https://templatemo.com/tm-585-barber-shop
 
                             <div class="position-absolute top-0 start-0 m-3" style="z-index:9999; pointer-events:auto;">
                                 <a href="index.html">
-                                    <img src="images/Øygarden_frisbee_logo.png" class="logo-image img-fluid" alt="Øygarden Logo" style="max-width: 220px; height: auto;">
+                                    <img src="images/Øygarden_frisbee_logo.png" class="logo-image img-fluid" alt="Øygarden Logo" style="max-width: 220px; height: auto; width: 100%;">
                                 </a>
                             </div>
 
-                            <div class="position-absolute top-0 end-0 m-3 d-flex gap-2" style="z-index:9999; pointer-events:auto;">
-                                <a class="btn custom-btn custom-border-btn custom-btn-bg-white mb-2" href="bestill-kurv.html" role="link" title="Bestill" style="position:relative; z-index:10000; pointer-events:auto;">Bestill Norskprodusert Kurv</a>
-                                <a class="btn custom-btn custom-border-btn custom-btn-bg-white mb-2" href="kurv-produsenter.html" role="link" title="Kurv Produsenter" style="position:relative; z-index:10000; pointer-events:auto;">Om Produksjonen</a>
-                               <!-- <a class="btn custom-btn custom-border-btn custom-btn-bg-white mb-2" href="oygarden-frisbeepark.html" role="link" title="Øygarden Frisbeepark" style="position:relative; z-index:10000; pointer-events:auto;">Øygarden Frisbeepark</a>-->
-                                <a class="btn custom-btn custom-border-btn custom-btn-bg-white mb-2" href="om-oss.html" onclick="window.location.href='om-oss.html'" role="link" title="Om oss" style="position:relative; z-index:10000; pointer-events:auto;">Om oss</a>
+                            <div class="position-absolute top-0 end-0 m-2 d-flex flex-column gap-2" style="z-index:9999; pointer-events:auto; max-width: 160px;">
+                                <a class="btn custom-btn custom-border-btn custom-btn-bg-white mb-0" href="bestill-kurv.html" role="link" title="Bestill" style="position:relative; z-index:10000; pointer-events:auto; font-size: 12px; padding: 8px 10px;">Bestill Kurv</a>
+                                <a class="btn custom-btn custom-border-btn custom-btn-bg-white mb-0" href="kurv-produsenter.html" role="link" title="Kurv Produsenter" style="position:relative; z-index:10000; pointer-events:auto; font-size: 12px; padding: 8px 10px;">Produksjon</a>
+                                <a class="btn custom-btn custom-border-btn custom-btn-bg-white mb-0" href="om-oss.html" onclick="window.location.href='om-oss.html'" role="link" title="Om oss" style="position:relative; z-index:10000; pointer-events:auto; font-size: 12px; padding: 8px 10px;">Om Oss</a>
                             </div>
+
+                            <style>
+                                @media (max-width: 768px) {
+                                    .position-absolute.top-0.end-0 {
+                                        flex-direction: column !important;
+                                        gap: 0.5rem !important; style="padding: 0 15px;">
+                                        <h1 class="text-white mb-lg-3 mb-4" style="font-size: clamp(28px, 7vw, 59px);"><strong>Øygarden <em>Frisbee</em></strong></h1>
+                                        <p class="text-black" style="font-size: clamp(14px, 4vw, 16px);
+                            </style>
 
                             <div class="container">
                                 <div class="row">
@@ -86,23 +94,29 @@ https://templatemo.com/tm-585-barber-shop
                             </div> -->
 
                             <!-- Testimonial Box -->
-                            <div class="position-absolute bottom-0 end-0 m-4" style="max-width: 450px; z-index: 999; pointer-events: auto;">
-                                <div style="background: white; border-left: 5px solid #c12828; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
-                                    <p style="font-size: 14px; color: #333; margin-bottom: 15px; font-style: italic; line-height: 1.5;">
+                            <div class="position-absolute bottom-0 end-0 m-2 m-md-4" style="max-width: 95vw; max-width: 400px; z-index: 999; pointer-events: auto;">
+                                <div style="background: white; border-left: 5px solid #c12828; padding: 15px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                                    <p style="font-size: 12px; color: #333; margin-bottom: 12px; font-style: italic; line-height: 1.4;">
                                         "Hadde vi bygget banen i dag, hadde vi valgt samme kurver igjen! Over 10 000 runder og 4,2 i rating – uten negative tilbakemeldinger."
                                     </p>
-                                    <p style="font-weight: bold; color: #c12828; margin: 0; font-size: 13px;">
+                                    <p style="font-weight: bold; color: #c12828; margin: 0; font-size: 11px;">
                                         – Bjørnar Rudsengen
                                     </p>
-                                    <p style="color: #999; margin: 3px 0 0 0; font-size: 12px;">
+                                    <p style="color: #999; margin: 3px 0 0 0; font-size: 11px;">
                                         Tallikbane Skjerva Diskgolf
                                     </p>
-                                    
                                 </div>
-                                 <p></p>
-                                                <div>
-                                                <iframe class="google-map" src="https://www.google.com/maps/d/u/0/embed?mid=1SNhku_MDyU33DSKw4q8itqVWNT-lhy4&ehbc=2E312F" width="100%" height="500" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                             </div>
+
+                            <style>
+                                @media (max-width: 640px) {
+                                    .position-absolute.bottom-0.end-0 {
+                                        display: none !important;
+                                    }
+                                }
+                            </style>
+
+                            
                             
                     </section>
 
