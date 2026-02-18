@@ -31,9 +31,6 @@
   .btn.custom-btn.d-md-block {
     display: none !important;
   }
-  .hamburger-btn.d-md-none {
-    display: block !important;
-  }
 }
 .hamburger-btn {
   position: absolute;
@@ -44,14 +41,15 @@
   border: none;
   padding: 0;
   cursor: pointer;
+  display: block !important;
 }
 .hamburger-btn span {
   display: block;
-  width: 28px;
-  height: 4px;
+  width: 40px;
+  height: 6px;
   background: #c12828;
-  margin: 5px 0;
-  border-radius: 2px;
+  margin: 7px 0;
+  border-radius: 3px;
 }
 .hamburger-overlay {
   display: none;
