@@ -50,28 +50,45 @@ https://templatemo.com/tm-585-barber-shop
                 
                 <div class="col-12 p-0">
                     <section class="img_hjem hero-section d-flex justify-content-center align-items-center position-relative" id="section_1">
+                        <a class="btn custom-btn d-none d-md-block" href="bestill-kurv.html" role="link" title="Bestill" style="position:absolute; top:1.2rem; right:1.2rem; z-index:20;">Bestill Norskprodusert Kurv</a>
+                        <button id="bestill-hamburger" class="hamburger-btn d-md-none" style="position:absolute; top:1.2rem; right:1.2rem; z-index:21; background:none; border:none; display:none;">
+                            <span style="display:block; width:28px; height:4px; background:#c12828; margin:5px 0; border-radius:2px;"></span>
+                            <span style="display:block; width:28px; height:4px; background:#c12828; margin:5px 0; border-radius:2px;"></span>
+                            <span style="display:block; width:28px; height:4px; background:#c12828; margin:5px 0; border-radius:2px;"></span>
+                        </button>
+                        <div id="bestill-dropdown" style="display:none; position:absolute; top:3.5rem; right:1.2rem; z-index:22;">
+                            <a class="btn custom-btn" href="bestill-kurv.html" role="link" title="Bestill">Bestill Norskprodusert Kurv</a>
+                        </div>
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var hamburger = document.getElementById('bestill-hamburger');
+            var dropdown = document.getElementById('bestill-dropdown');
+            if(hamburger) {
+                hamburger.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+                });
+                document.addEventListener('click', function(e) {
+                    if(dropdown.style.display === 'block') dropdown.style.display = 'none';
+                });
+            }
+        });
+        </script>
 
-                            <div class="position-absolute top-0 start-0 m-3" style="z-index:9999; pointer-events:auto;">
-                                <a href="index.html">
-                                    <img src="images/Øygarden_frisbee_logo.png" class="logo-image img-fluid" alt="Øygarden Logo" style="max-width: 220px; height: auto;">
-                                </a>
-                            </div>
-
-                            <div class="position-absolute top-0 end-0 m-3 d-flex gap-2" style="z-index:9999; pointer-events:auto;">
-                                <a class="btn custom-btn custom-border-btn custom-btn-bg-white mb-2" href="bestill-kurv.html" role="link" title="Bestill" style="position:relative; z-index:10000; pointer-events:auto;">Bestill Norskprodusert Kurv</a>
-                                <!--<a class="btn custom-btn custom-border-btn custom-btn-bg-white mb-2" href="kurv-produsenter.html" role="link" title="Kurv Produsenter" style="position:relative; z-index:10000; pointer-events:auto;">Om Produksjonen</a>-->
-                               <!-- <a class="btn custom-btn custom-border-btn custom-btn-bg-white mb-2" href="oygarden-frisbeepark.html" role="link" title="Øygarden Frisbeepark" style="position:relative; z-index:10000; pointer-events:auto;">Øygarden Frisbeepark</a>-->
-                                <!--<a class="btn custom-btn custom-border-btn custom-btn-bg-white mb-2" href="om-oss.html" onclick="window.location.href='om-oss.html'" role="link" title="Om oss" style="position:relative; z-index:10000; pointer-events:auto;">Om oss</a>-->
+                            <div class="hero-topbar d-flex align-items-center" style="position:absolute; top:0; left:0; width:100%; z-index:10; padding:1rem 0 0 1rem;">
+                                                    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
+                                                        <a href="index.html">
+                                                            <img src="images/Øygarden_frisbee_logo.png" class="" alt="Øygarden Logo" style="max-width:220px; height:auto;">
+                                                        </a>
+                                                        <p class="text-black" style="opacity: 0.8; font-size: 1.15rem; margin:0; padding-top:0.3rem;">Norske Kurver til Norske Skoger</p>
+                                                    </div>
+                                
                             </div>
 
                             <div class="container">
                                 <div class="row">
 
-                                    <div class="position-relative" data-aos="fade-up" data-aos-delay="200" style="margin-top: -210px;">
-                                        <h1 class="text-white mb-lg-3 mb-4"><strong>Øygarden <em>Frisbee</em></strong></h1>
-                                        <p class="text-black mt-2 mb-0" style="font-size:1.35rem; font-weight:700; letter-spacing:0.01em;">Norske Kurver til Norske Skoger</p>
-                                        <!-- <a class="btn custom-btn smoothscroll mb-2" href="#section_3">What we do</a> -->
-                                    </div>
+                                    
                                 </div>
                             </div>
 
@@ -95,7 +112,9 @@ https://templatemo.com/tm-585-barber-shop
                                     <p style="color: #999; margin: 3px 0 0 0; font-size: 12px;">
                                         Tallikbane Skjerva Diskgolf
                                     </p>
-                                    
+                                </div>
+                                <div style="text-align:right; margin-top: 8px;">
+                                    <a class="btn custom-btn btn-sm" href="bestill-kurv.html" role="link" title="Bestill">Bestill kurv</a>
                                 </div>
                             </div>
                             

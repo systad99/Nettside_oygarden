@@ -200,9 +200,37 @@
                         <p><strong>Kurvene er godkjent av PDGA til Championship Standard (godkjent i 2021).</strong></p>
                         <p><a href="https://www.pdga.com/technical-standards/equipment-certification/targets/blink" target="_blank" style="color: #c12828; text-decoration: none; font-weight: bold;">Se PDGA godkjenning →</a></p>
                         <p style="text-align: center; margin-top: 30px; font-style: italic; color: #999;">
-                            
-                            ↓ Scroll ned for å se flere bilder av kurven vår ↓
+                            ↓ Scroll til bunnen for å se flere bilder av kurven vår ↓
                         </p>
+                    </div>
+
+                    <!-- Prisforespørsel-boks -->
+                    <div class="contact-form-section">
+                        <h3 class="mb-4" style="color: #c12828;">Send Forespørsel</h3>
+                        <p class="mb-4">Fyll ut skjemaet nedenfor, og vi vil svare deg så fort som mulig.</p>
+                        <form id="contact-form" action="https://formsubmit.co/jisystad@gmail.com" method="POST">
+                            <input type="hidden" name="_captcha" value="false">
+                            <div class="form-group">
+                                <label for="name">Navn *</label>
+                                <input type="text" id="name" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">E-post *</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Telefon</label>
+                                <input type="tel" id="phone" name="phone">
+                            </div>
+                            <div class="form-group">
+                                <label for="message">Hva vil du vite / Din melding *</label>
+                                <textarea id="message" name="message" required></textarea>
+                            </div>
+                            <button type="submit" class="submit-btn">Send Forespørsel</button>
+                            <div class="success-message" id="success-message">
+                                ✓ Din forespørsel er sendt! Vi svarer så fort som mulig.
+                            </div>
+                        </form>
                     </div>
 
                     <!-- Bildegalleri -->
@@ -225,41 +253,7 @@
                     </div>
                 </div>
 
-                <div class="col-lg-6 col-12">
-                    <!-- Kontaktskjema -->
-                    <div class="contact-form-section">
-                        <h3 class="mb-4" style="color: #c12828;">Send Forespørsel</h3>
-                        <p class="mb-4">Fyll ut skjemaet nedenfor, og vi vil svare deg så fort som mulig.</p>
-                        
-                        <form id="contact-form" action="https://formsubmit.co/jisystad@gmail.com" method="POST">
-                            <input type="hidden" name="_captcha" value="false">
-
-                            <div class="form-group">
-                                <label for="name">Navn *</label>
-                                <input type="text" id="name" name="name" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="email">E-post *</label>
-                                <input type="email" id="email" name="email" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="phone">Telefon</label>
-                                <input type="tel" id="phone" name="phone">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="message">Hva vil du vite / Din melding *</label>
-                                <textarea id="message" name="message" required></textarea>
-                            </div>
-
-                            <button type="submit" class="submit-btn">Send Forespørsel</button>
-                            <div class="success-message" id="success-message">
-                                ✓ Din forespørsel er sendt! Vi svarer så fort som mulig.
-                            </div>
-                        </form>
-                    </div>
+                
                 </div>
             </div>
         </div>

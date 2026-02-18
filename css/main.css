@@ -1,3 +1,85 @@
+/* Hamburger og bestill-knapp responsiv stil */
+@media (max-width: 700px) {
+  .btn.custom-btn.d-md-block {
+    display: none !important;
+  }
+  .hamburger-btn.d-md-none {
+    display: block !important;
+  }
+}
+.hamburger-btn {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.2rem;
+  z-index: 21;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+.hamburger-btn span {
+  display: block;
+  width: 28px;
+  height: 4px;
+  background: #c12828;
+  margin: 5px 0;
+  border-radius: 2px;
+}
+#bestill-dropdown {
+  display: none;
+  position: absolute;
+  top: 3.5rem;
+  right: 1.2rem;
+  z-index: 22;
+}
+ .hero-topbar {
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 100%;
+   z-index: 10;
+   padding: 1rem 1rem 0 1rem;
+   box-sizing: border-box;
+ }
+ .hero-topbar .logo-image {
+   max-width: 120px;
+   height: auto;
+   display: block;
+ }
+ .hero-topbar .btn {
+   margin-left: 0;
+   margin-top: 0;
+   vertical-align: middle;
+ }
+@media (max-width: 700px) {
+  .hero-topbar {
+    padding: 0.5rem 0.5rem 0 0.5rem;
+  }
+  .hero-topbar .logo-image {
+    max-width: 80px;
+  }
+  .hero-topbar .btn {
+    font-size: 0.95rem;
+    padding: 0.4em 0.9em;
+  }
+}
+.hero-headerbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1rem 0 0 0;
+  margin-bottom: 1.5rem;
+}
 @media (max-width: 700px) {
   /* Flytt logo over knapper og gjør logo mindre */
   .logo-image {
