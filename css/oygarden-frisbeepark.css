@@ -1,0 +1,153 @@
+/* Seksjonskort for frisbeepark, moderne og responsiv */
+.frisbeepark-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  margin: 3rem auto 3rem auto;
+  max-width: 950px;
+}
+.frisbeepark-section-card {
+  background: #d6a354;
+  border-radius: 18px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+  padding: 2.2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.frisbeepark-section-content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 2.5rem;
+}
+.frisbeepark-section-img {
+  flex: 0 0 300px;
+  max-width: 320px;
+  min-width: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.frisbeepark-section-img img {
+  width: 100%;
+  max-width: 300px;
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.frisbeepark-section-text {
+  flex: 1 1 0%;
+  color: #fff;
+}
+.frisbeepark-section-text h2 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1.7rem;
+  color: #fff;
+  font-weight: bold;
+}
+.frisbeepark-section-text h3 {
+  margin-top: 0.2rem;
+  margin-bottom: 0.7rem;
+  font-size: 1.15rem;
+  color: #fffbe6;
+  font-weight: 500;
+}
+.frisbeepark-section-text p {
+  font-size: 1.05rem;
+  color: #fff;
+  margin-bottom: 0.7rem;
+}
+.frisbeepark-section-btn {
+  background: #fff;
+  color: #c12828;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  padding: 0.7em 1.5em;
+  margin-top: 0.7rem;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: background 0.2s, color 0.2s;
+  display: inline-block;
+}
+.frisbeepark-section-btn:hover {
+  background: #c12828;
+  color: #fff;
+}
+@media (max-width: 900px) {
+  .frisbeepark-section-content {
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: stretch;
+  }
+  .frisbeepark-section-img {
+    max-width: 100%;
+    margin-bottom: 1rem;
+  }
+}
+body {
+  background: #f6e9d7;
+  font-family: 'Unbounded', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+.frisbeepark-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.frisbeepark-header .logo {
+  width: 80px;
+  margin-bottom: 1rem;
+}
+.frisbeepark-header h1 {
+  color: #d6a354;
+  font-size: 2.8rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+.frisbeepark-cards {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.frisbeepark-card {
+  background: #d6a354;
+  color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  width: 320px;
+  padding-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.frisbeepark-card img {
+  width: 100%;
+  border-radius: 12px 12px 0 0;
+  height: 220px;
+  object-fit: cover;
+}
+.frisbeepark-card h2 {
+  margin: 1rem 0 0.5rem 0;
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+.frisbeepark-card p {
+  margin: 0 1rem;
+  font-size: 1rem;
+  color: #fff;
+  text-align: center;
+}
+@media (max-width: 900px) {
+  .frisbeepark-cards {
+    flex-direction: column;
+    align-items: center;
+  }
+  .frisbeepark-card {
+    width: 90%;
+    margin-bottom: 2rem;
+  }
+}

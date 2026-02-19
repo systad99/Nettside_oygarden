@@ -1,0 +1,84 @@
+/* Tidslinje for kurvproduksjon */
+.kurv-timeline {
+  position: relative;
+  margin: 3rem auto 3rem auto;
+  max-width: 800px;
+  padding-left: 20px;
+}
+.kurv-timeline::before {
+  content: '';
+  position: absolute;
+  left: 30px;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: #d6a354;
+  border-radius: 2px;
+}
+.kurv-timeline-step {
+  position: relative;
+  margin-bottom: 2.5rem;
+  padding-left: 60px;
+  min-height: 80px;
+}
+.kurv-timeline-dot {
+  position: absolute;
+  left: 18px;
+  top: 10px;
+  width: 24px;
+  height: 24px;
+  background: #fff;
+  border: 4px solid #d6a354;
+  border-radius: 50%;
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.kurv-timeline-content {
+  background: #fffbe6;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  padding: 1.2rem 1.5rem;
+  color: #333;
+  min-height: 60px;
+  display: flex;
+  align-items: flex-start;
+  gap: 1.2rem;
+}
+.kurv-timeline-content img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #eee;
+}
+.kurv-timeline-content .kurv-timeline-text {
+  flex: 1 1 0%;
+}
+.kurv-timeline-content h4 {
+  margin: 0 0 0.3rem 0;
+  font-size: 1.1rem;
+  color: #c12828;
+  font-weight: bold;
+}
+.kurv-timeline-content p {
+  margin: 0;
+  font-size: 1rem;
+}
+@media (max-width: 600px) {
+  .kurv-timeline {
+    padding-left: 0;
+  }
+  .kurv-timeline-step {
+    padding-left: 40px;
+  }
+  .kurv-timeline-content {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 1rem 0.7rem;
+  }
+  .kurv-timeline-content img {
+    width: 100%;
+    height: 120px;
+    margin-bottom: 0.5rem;
+  }
+}
