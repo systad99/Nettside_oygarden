@@ -43,7 +43,7 @@
                                     <section class="frisbeepark-section-card">
                                         <div class="frisbeepark-section-content">
                                             <div class="frisbeepark-section-img">
-                                                <img src="images/Banekart_3.0_print.jpg" alt="Bane">
+                                                <img src="images/Banekart_3.0_print.jpg" alt="Bane" class="enlargeable-img">
                                             </div>
                                             <div class="frisbeepark-section-text">
                                                 <h2>Diskgolfbanen</h2>
@@ -55,7 +55,7 @@
                                     <section class="frisbeepark-section-card">
                                         <div class="frisbeepark-section-content">
                                             <div class="frisbeepark-section-img">
-                                                <img src="images/20221022_114517.jpg" alt="Bua">
+                                                <img src="images/20221022_114517.jpg" alt="Bua" class="enlargeable-img">
                                             </div>
                                             <div class="frisbeepark-section-text">
                                                 <h2>Bua</h2>
@@ -67,13 +67,19 @@
                                     <section class="frisbeepark-section-card">
                                         <div class="frisbeepark-section-content">
                                             <div class="frisbeepark-section-img">
-                                                <img src="images/event_garasje.jpg" alt="Teambuilding">
+                                                <img src="images/event_garasje.jpg" alt="Teambuilding" class="enlargeable-img">
                                             </div>
+                                                    <!-- Popup for store bilder -->
+                                                    <div id="image-modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.92); align-items:center; justify-content:center;">
+                                                        <img id="modal-img" src="" alt="Stort bilde" style="max-width:90vw; max-height:90vh; box-shadow:0 4px 32px #000; border-radius:16px;">
+                                                    </div>
                                             <div class="frisbeepark-section-text">
                                                 <h2>Teambuilding</h2>
                                                 <h3>Kursopplegg og teambuilding</h3>
                                                 <p>Book en dag med kurs og teambuilding for din bedrift, vennegjeng eller gruppe. Våre erfarne teamspillere gir dere en unik opplevelse!</p>
-                                                <a href="mailto:jisystad@gmail.com" class="btn btn-primary frisbeepark-section-btn">Ta kontakt her</a>
+                                                <a href="mailto:jisystad@gmail.com" class="btn btn-primary frisbeepark-section-btn">Ta kontakt på e-post</a>
+                                                <br>
+                                                <a href="tel:97570183" class="btn btn-primary frisbeepark-section-btn" style="margin-top:0.5rem; background:#fff; color:#c12828; border:1px solid #c12828;">eller ring 975 70 183</a>
                                             </div>
                                         </div>
                                     </section>
@@ -84,5 +90,26 @@
         <script src="js/click-scroll.js"></script>
         <script src="js/custom.js"></script>
         <script src="js/flipp.js"></script>
+        <script>
+        // Bilde-popup: Klikk for å forstørre, klikk igjen for å lukke
+        document.querySelectorAll('.enlargeable-img').forEach(function(img) {
+            img.style.cursor = 'zoom-in';
+            img.addEventListener('click', function() {
+                var modal = document.getElementById('image-modal');
+                var modalImg = document.getElementById('modal-img');
+                if (modal.style.display === 'flex' && modalImg.src === img.src) {
+                    modal.style.display = 'none';
+                    modalImg.src = '';
+                } else {
+                    modalImg.src = img.src;
+                    modal.style.display = 'flex';
+                }
+            });
+        });
+        document.getElementById('image-modal').addEventListener('click', function() {
+            this.style.display = 'none';
+            document.getElementById('modal-img').src = '';
+        });
+        </script>
     </body>
 </html>
