@@ -59,6 +59,15 @@
         width: auto;
         margin: 0;
     }
+    select {
+        width: 100%;
+        margin-top: 5px;
+        padding: 8px;
+        border: 1px solid #b9c5ca;
+        border-radius: 4px;
+        font-size: 14px;
+        background: #fff;
+    }
     button {
         width: 100%;
         margin-top: 18px;
@@ -86,6 +95,18 @@
         line-height: 1.4;
         margin-top: 10px;
     }
+    .warning {
+        margin-top: 14px;
+        padding: 12px;
+        border: 1px solid #d8a735;
+        border-left: 4px solid #d8a735;
+        border-radius: 4px;
+        background: #fff7df;
+        color: #4b3b13;
+        font-size: 13px;
+        font-weight: bold;
+        line-height: 1.4;
+    }
     .drawing {
         padding: 20px;
         overflow: auto;
@@ -108,8 +129,8 @@
     <section class="panel">
         <h1>VA-grøft Generator</h1>
 
-        <label for="overdekning">Overdekning til øverste rør (m)</label>
-        <input id="overdekning" type="number" value="1.20" step="0.05" min="0">
+        <label for="overdekning">Overdekning / frostdybde iht. lokal VA-norm (m)</label>
+        <input id="overdekning" type="number" value="1.80" step="0.05" min="0">
 
         <label for="vinkel">Skråningsvinkel (grader)</label>
         <input id="vinkel" type="number" value="45" min="0" max="80">
@@ -130,11 +151,17 @@
         <input id="dnOvervann" type="number" value="200" step="10" min="0">
 
         <h2>Krav og standardverdier</h2>
-        <label for="fundament">Fundament under laveste rør (m)</label>
-        <input id="fundament" type="number" value="0.15" step="0.05" min="0">
+        <label for="grunnforhold">Grunnforhold for fundamenttabell</label>
+        <select id="grunnforhold">
+            <option value="losmasser" selected>Løsmasser</option>
+            <option value="fjell">Fjell eller betong</option>
+        </select>
 
-        <label for="vertikalAvstand">Vertikal avstand mellom rør (m)</label>
-        <input id="vertikalAvstand" type="number" value="0.15" step="0.05" min="0">
+        <label for="fundament">Fundament under laveste rør (m)</label>
+        <input id="fundament" type="text" value="0.15" readonly>
+
+        <label for="vertikalAvstand">Ekstra vertikal avstand mellom rør (m)</label>
+        <input id="vertikalAvstand" type="number" value="0.00" step="0.05" min="0">
 
         <label for="beskyttelseslag">Beskyttelseslag over øverste rør (m)</label>
         <input id="beskyttelseslag" type="number" value="0.30" step="0.05" min="0">
@@ -145,7 +172,8 @@
         <button onclick="tegn()">Tegn VA-grøft</button>
 
         <div class="summary" id="summary"></div>
-        <p class="note">Standardverdier er veiledende. Sjekk alltid aktuell kommunal VA-norm, geoteknikk og prosjekteringsgrunnlag.</p>
+        <div class="warning">Må kontrolleres mot lokal VA-norm.</div>
+        <p class="note">Standardverdier er veiledende. Sjekk alltid geoteknikk og prosjekteringsgrunnlag.</p>
     </section>
 
     <section class="drawing">
@@ -167,17 +195,28 @@ function formatDn(value) {
 }
 
 function avstandskrav(diameterMm) {
-    if (diameterMm <= 225) return { side: 0.20, mellom: 0.20, vertikal: 0.15 };
-    if (diameterMm <= 350) return { side: 0.25, mellom: 0.20, vertikal: 0.15 };
-    if (diameterMm <= 700) return { side: 0.35, mellom: 0.25, vertikal: 0.15 };
-    if (diameterMm <= 1200) return { side: 0.425, mellom: 0.40, vertikal: 0.15 };
-    return { side: 0.50, mellom: 0.50, vertikal: 0.15 };
+    if (diameterMm <= 225) return { a: 0.20, bc: 0.15 };
+    if (diameterMm <= 350) return { a: 0.25, bc: 0.20 };
+    if (diameterMm <= 700) return { a: 0.35, bc: 0.25 };
+    if (diameterMm <= 1200) return { a: 0.425, bc: 0.40 };
+    return { a: 0.50, bc: 0.50 };
+}
+
+function fundamentTykkelse(diameterMm, grunnforhold) {
+    if (diameterMm < 400) return 0.15;
+    if (diameterMm <= 1200) return grunnforhold === "fjell" ? 0.30 : 0.20;
+    return grunnforhold === "fjell" ? 0.40 : 0.25;
+}
+
+function sideGap(leftPipe, rightPipe) {
+    const maxDn = Math.max(leftPipe.dn, rightPipe.dn);
+    return avstandskrav(maxDn).bc;
 }
 
 function tegn() {
     const overdekning = parseFloat(document.getElementById("overdekning").value) || 0;
     const vinkel = parseFloat(document.getElementById("vinkel").value) || 0;
-    const fundament = parseFloat(document.getElementById("fundament").value) || 0;
+    const grunnforhold = document.getElementById("grunnforhold").value;
     const vertikalAvstandInput = parseFloat(document.getElementById("vertikalAvstand").value) || 0;
     const beskyttelseslag = parseFloat(document.getElementById("beskyttelseslag").value) || 0;
     const dnVann = parseFloat(document.getElementById("dnVann").value) || 0;
@@ -198,25 +237,49 @@ function tegn() {
 
     const maxDn = Math.max(...pipes.map(pipe => pipe.dn));
     const krav = avstandskrav(maxDn);
-    const sideAvstand = krav.side;
-    const vertikalAvstand = Math.max(vertikalAvstandInput, krav.vertikal);
+    const sideAvstand = krav.a;
+    const minRorAvstand = krav.bc;
+    const fundament = fundamentTykkelse(maxDn, grunnforhold);
+    const vertikalAvstand = vertikalAvstandInput;
     document.getElementById("sideAvstand").value = sideAvstand.toFixed(2);
+    document.getElementById("fundament").value = fundament.toFixed(2);
     document.getElementById("vertikalAvstand").value = vertikalAvstand.toFixed(2);
 
-    let topOfCurrentPipe = null;
-    pipes.forEach((pipe, index) => {
+    pipes.forEach(pipe => {
         pipe.diameter = meter(pipe.dn);
         pipe.radius = pipe.diameter / 2;
+    });
 
-        if (index === 0) {
-            pipe.cy = 0;
-        } else {
-            pipe.cy = topOfCurrentPipe - vertikalAvstand - pipe.radius;
-        }
+    const spillPipe = pipes.find(pipe => pipe.key === "spill");
+    const overvannPipe = pipes.find(pipe => pipe.key === "overvann");
+    const vannPipe = pipes.find(pipe => pipe.key === "vann");
 
+    spillPipe.cy = 0;
+
+    if (overvannPipe) {
+        overvannPipe.cy = spillPipe.cy;
+    }
+
+    if (vannPipe) {
+        const lowerTop = Math.min(...pipes
+            .filter(pipe => pipe.key !== "vann")
+            .map(pipe => pipe.cy - pipe.radius));
+        vannPipe.cy = lowerTop - vertikalAvstand - vannPipe.radius;
+    }
+
+    pipes.forEach(pipe => {
         pipe.bottom = pipe.cy + pipe.radius;
         pipe.top = pipe.cy - pipe.radius;
-        topOfCurrentPipe = pipe.top;
+    });
+
+    const rorAvstander = pipes.slice(0, -1).map((pipe, index) => sideGap(pipe, pipes[index + 1]));
+    const rorPakkeBredde = pipes.reduce((sum, pipe) => sum + pipe.diameter, 0)
+        + rorAvstander.reduce((sum, gap) => sum + gap, 0);
+
+    let currentX = -rorPakkeBredde / 2;
+    pipes.forEach((pipe, index) => {
+        pipe.x = currentX + pipe.radius;
+        currentX += pipe.diameter + (rorAvstander[index] || 0);
     });
 
     const lowestBottom = Math.max(...pipes.map(pipe => pipe.bottom));
@@ -229,8 +292,7 @@ function tegn() {
     const toppLedningssone = Math.max(0, overdekning - beskyttelseslag);
     const bunnLedningssone = lowestBottom - highestTop + overdekning + fundament;
     const dybde = bunnLedningssone;
-    const maxDiameter = Math.max(...pipes.map(pipe => pipe.diameter));
-    const breddeVedRor = maxDiameter + sideAvstand * 2;
+    const breddeVedRor = rorPakkeBredde + sideAvstand * 2;
     const theta = vinkel * Math.PI / 180;
     const bunnbredde = Math.max(0.10, breddeVedRor - 2 * fundament * Math.tan(theta));
     const toppbredde = breddeVedRor + 2 * (dybde - fundament) * Math.tan(theta);
@@ -238,9 +300,11 @@ function tegn() {
     document.getElementById("summary").innerHTML = `
         Dybde: <strong>${formatMeter(dybde)}</strong><br>
         Overdekning: <strong>${formatMeter(overdekning)}</strong><br>
-        Fundament: <strong>${formatMeter(fundament)}</strong><br>
-        Sideavstand: <strong>${formatMeter(sideAvstand)}</strong><br>
-        Vertikal avstand: <strong>${formatMeter(vertikalAvstand)}</strong><br>
+        A sideavstand: <strong>${formatMeter(sideAvstand)}</strong><br>
+        B/C røravstand: <strong>${formatMeter(minRorAvstand)}</strong><br>
+        E fundament (${grunnforhold === "fjell" ? "fjell/betong" : "løsmasser"}): <strong>${formatMeter(fundament)}</strong><br>
+        Beregnede røravstander: <strong>${rorAvstander.length ? rorAvstander.map(formatMeter).join(", ") : formatMeter(0)}</strong><br>
+        Ekstra vertikal avstand: <strong>${formatMeter(vertikalAvstand)}</strong><br>
         Spillvann ligger lavest: <strong>ja</strong>
     `;
 
@@ -275,6 +339,29 @@ function tegn() {
         ctx.fillText(text, x, y);
     }
 
+    function labelBox(text, x, y, align = "center", weight = "normal") {
+        ctx.save();
+        ctx.font = `${weight} 14px Arial`;
+        const metrics = ctx.measureText(text);
+        const width = metrics.width + 10;
+        const height = 20;
+        const left = align === "left" ? x - 2 : x - width / 2;
+
+        ctx.fillStyle = "rgba(255, 254, 250, 0.92)";
+        ctx.fillRect(left, y - height / 2, width, height);
+        ctx.fillStyle = "#111";
+        ctx.textAlign = align;
+        ctx.textBaseline = "middle";
+        ctx.fillText(text, x, y);
+        ctx.restore();
+    }
+
+    function pipeCode(pipe) {
+        if (pipe.key === "spill") return "SP";
+        if (pipe.key === "overvann") return "OV";
+        return "V";
+    }
+
     function dimension(x1, y1, x2, y2, text, textOffsetX = 0, textOffsetY = -12) {
         ctx.save();
         ctx.strokeStyle = "#111";
@@ -299,7 +386,7 @@ function tegn() {
         });
 
         if (text) {
-            label(text, (x1 + x2) / 2 + textOffsetX, (y1 + y2) / 2 + textOffsetY);
+            labelBox(text, (x1 + x2) / 2 + textOffsetX, (y1 + y2) / 2 + textOffsetY);
         }
 
         ctx.restore();
@@ -316,8 +403,44 @@ function tegn() {
         ctx.lineTo(X(width / 2), Y(y));
         ctx.stroke();
         ctx.setLineDash([]);
-        label(text, X(width / 2) + 14, Y(y), "left", "bold");
+        labelBox(text, X(width / 2) + 14, Y(y), "left", "bold");
         ctx.restore();
+    }
+
+    function pipeGapDimension(leftPipe, rightPipe, gap, index) {
+        const leftEdge = leftPipe.x + leftPipe.radius;
+        const rightEdge = rightPipe.x - rightPipe.radius;
+        const arrowY = Y(Math.max(leftPipe.y, rightPipe.y));
+        const midX = (X(leftEdge) + X(rightEdge)) / 2;
+        const labelY = Y(dybde) + 64 + index * 22;
+
+        dimension(X(leftEdge), arrowY, X(rightEdge), arrowY, "", 0, 0);
+
+        ctx.save();
+        ctx.strokeStyle = "#111";
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(midX, arrowY);
+        ctx.lineTo(midX, labelY - 10);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        labelBox(`Avstand ${formatMeter(gap)}`, midX, labelY);
+        ctx.restore();
+    }
+
+    function drawLegend() {
+        const x = 24;
+        let y = 104;
+
+        pipes.forEach(pipe => {
+            ctx.fillStyle = pipe.color;
+            ctx.fillRect(x, y - 7, 14, 14);
+            ctx.strokeStyle = "#111";
+            ctx.strokeRect(x, y - 7, 14, 14);
+            label(`${pipeCode(pipe)} ${pipe.navn} ${formatDn(pipe.dn)}`, x + 22, y, "left", "bold");
+            y += 24;
+        });
     }
 
     ctx.fillStyle = "#eee7d3";
@@ -336,30 +459,29 @@ function tegn() {
 
     horizontalBoundary(toppLedningssone, "Ledningssone");
     horizontalBoundary(dybde - fundament, "Topp fundament");
+    drawLegend();
 
     pipes.forEach(pipe => {
         ctx.beginPath();
-        ctx.arc(X(0), Y(pipe.y), pipe.radius * scale, 0, Math.PI * 2);
+        ctx.arc(X(pipe.x), Y(pipe.y), pipe.radius * scale, 0, Math.PI * 2);
         ctx.fillStyle = pipe.color;
         ctx.fill();
         ctx.strokeStyle = "#111";
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        label(pipe.navn, X(0), Y(pipe.y), "center", "bold");
-        label(formatDn(pipe.dn), X(0), Y(pipe.y - pipe.radius - 0.05));
-    });
-
-    pipes.slice(0, -1).forEach((pipe, index) => {
-        const nextPipe = pipes[index + 1];
-        const x = X(-breddeVedRor / 2) - 34 - index * 34;
-        dimension(x, Y(nextPipe.y + nextPipe.radius), x, Y(pipe.y - pipe.radius), formatMeter(vertikalAvstand), -42, 0);
+        label(pipeCode(pipe), X(pipe.x), Y(pipe.y), "center", "bold");
     });
 
     dimension(X(-toppbredde / 2), Y(0) - 34, X(toppbredde / 2), Y(0) - 34, `Toppbredde ${formatMeter(toppbredde)}`);
     dimension(X(-bunnbredde / 2), Y(dybde) + 24, X(bunnbredde / 2), Y(dybde) + 24, `Bunnbredde ${formatMeter(bunnbredde)}`, 0, 16);
-    dimension(X(-breddeVedRor / 2), Y(pipes[0].y), X(-pipes[0].radius), Y(pipes[0].y), `Sideavstand ${formatMeter(sideAvstand)}`, 0, -14);
-    dimension(X(pipes[0].radius), Y(pipes[0].y), X(breddeVedRor / 2), Y(pipes[0].y), formatMeter(sideAvstand), 0, -14);
+    dimension(X(-breddeVedRor / 2), Y(pipes[0].y), X(-rorPakkeBredde / 2), Y(pipes[0].y), formatMeter(sideAvstand), 0, -14);
+    dimension(X(rorPakkeBredde / 2), Y(pipes[0].y), X(breddeVedRor / 2), Y(pipes[0].y), formatMeter(sideAvstand), 0, -14);
+
+    pipes.slice(0, -1).forEach((pipe, index) => {
+        const nextPipe = pipes[index + 1];
+        pipeGapDimension(pipe, nextPipe, rorAvstander[index], index);
+    });
 
     const dimX = X(toppbredde / 2) + 70;
     dimension(dimX, Y(0), dimX, Y(dybde), `Dybde ${formatMeter(dybde)}`, 60, 0);
