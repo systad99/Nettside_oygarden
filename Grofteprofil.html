@@ -2,102 +2,164 @@
 <html lang="no">
 <head>
 <meta charset="UTF-8">
-<title>Grøftesnitt Generator</title>
+<title>Grøftesnitt PRO v2</title>
 <style>
-    body { font-family: Arial; margin: 20px; }
-    input { margin: 5px; }
-    canvas { border: 1px solid #333; margin-top: 20px; }
+body { font-family: Arial; margin: 20px; }
+canvas { border: 1px solid #222; }
 </style>
 </head>
 <body>
 
-<h2>Grøftesnitt Generator</h2>
+<h2>Grøftesnitt – versjon 2</h2>
+<button onclick="tegn()">Tegn</button>
 
-<label>Overdekning (m):</label>
-<input id="overdekning" type="number" value="0.6" step="0.1"><br>
-
-<label>Rørdiametre (m, kommaseparert):</label>
-<input id="ror" type="text" value="0.11,0.11,0.11"><br>
-
-<label>Avstand mellom rør (m):</label>
-<input id="avstand" type="number" value="0.05" step="0.01"><br>
-
-<label>Fundament (m):</label>
-<input id="fundament" type="number" value="0.1" step="0.01"><br>
-
-<label>Skråningsvinkel (grader):</label>
-<input id="vinkel" type="number" value="45"><br>
-
-<br>
-<button onclick="tegn()">Tegn grøft</button>
-
-<canvas id="canvas" width="800" height="500"></canvas>
+<canvas id="c" width="1000" height="650"></canvas>
 
 <script>
-function tegn() {
-    const overdekning = parseFloat(document.getElementById("overdekning").value);
-    const ror = document.getElementById("ror").value.split(",").map(Number);
-    const avstand = parseFloat(document.getElementById("avstand").value);
-    const fundament = parseFloat(document.getElementById("fundament").value);
-    const vinkel = parseFloat(document.getElementById("vinkel").value);
+function tegn(){
 
-    const maksDiameter = Math.max(...ror);
+const ctx = document.getElementById("c").getContext("2d");
+ctx.clearRect(0,0,1000,650);
 
-    const dybde = overdekning + maksDiameter + fundament;
-    const bunnbredde = ror.reduce((a,b) => a+b, 0) + avstand * (ror.length - 1);
+// ---------------- PARAMETERE (mm)
+const overdekning = 400;
+const ledning = 150;
+const fundament = 100;
+const ror = 110;
+const side = 100;
+const vinkel = 45;
 
-    const theta = vinkel * Math.PI / 180;
-    const toppbredde = bunnbredde + 2 * dybde * Math.tan(theta);
+// ---------------- BEREGNING
+const dybde = overdekning + ledning + fundament;
+const bunn = ror + side*2;
+const topp = bunn + 2 * dybde * Math.tan(vinkel*Math.PI/180);
 
-    console.log("Dybde:", dybde);
-    console.log("Bunnbredde:", bunnbredde);
-    console.log("Toppbredde:", toppbredde);
+// ---------------- SKALA
+const s = 0.5;
+const cx = 500;
+const topY = 60;
 
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
+const X = x => cx + x*s;
+const Y = y => topY + y*s;
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Skalering
-    const scale = 300; // px per meter
-
-    const centerX = canvas.width / 2;
-    const topY = 50;
-
-    // Konverter til canvas-koordinater
-    function X(x) { return centerX + x * scale; }
-    function Y(y) { return topY + y * scale; }
-
-    // Tegn grøft
-    ctx.beginPath();
-    ctx.moveTo(X(-toppbredde/2), Y(0));
-    ctx.lineTo(X(toppbredde/2), Y(0));
-    ctx.lineTo(X(bunnbredde/2), Y(dybde));
-    ctx.lineTo(X(-bunnbredde/2), Y(dybde));
-    ctx.closePath();
-    ctx.stroke();
-
-    // Tegn rør
-    let currentX = -bunnbredde / 2;
-
-    ror.forEach(diameter => {
-        const radius = diameter / 2;
-        const cx = currentX + radius;
-        const cy = dybde - fundament - radius;
-
+// ---------------- SKRAVUR
+function hatch(areaFn){
+    ctx.save();
+    ctx.clip(areaFn);
+    for(let i=-1000;i<1000;i+=10){
         ctx.beginPath();
-        ctx.arc(X(cx), Y(cy), radius * scale, 0, 2 * Math.PI);
+        ctx.moveTo(i,0);
+        ctx.lineTo(i+1000,1000);
+        ctx.strokeStyle="#aaa";
         ctx.stroke();
-
-        currentX += diameter + avstand;
-    });
-
-    // Tekst
-    ctx.fillText(`Dybde: ${dybde.toFixed(2)} m`, 10, 20);
-    ctx.fillText(`Toppbredde: ${toppbredde.toFixed(2)} m`, 10, 40);
+    }
+    ctx.restore();
 }
 
-// Tegn ved start
+// ---------------- GRØFT FORM
+ctx.beginPath();
+ctx.moveTo(X(-topp/2), Y(0));
+ctx.lineTo(X(topp/2), Y(0));
+ctx.lineTo(X(bunn/2), Y(dybde-50));
+
+// avrundet bunn
+ctx.quadraticCurveTo(X(0), Y(dybde+30), X(-bunn/2), Y(dybde-50));
+
+ctx.closePath();
+ctx.stroke();
+
+// ---------------- SKRAVUR MASSER
+ctx.save();
+ctx.beginPath();
+ctx.moveTo(X(-topp/2), Y(0));
+ctx.lineTo(X(topp/2), Y(0));
+ctx.lineTo(X(bunn/2), Y(dybde));
+ctx.lineTo(X(-bunn/2), Y(dybde));
+ctx.closePath();
+ctx.clip();
+
+for(let i=-500;i<1500;i+=12){
+    ctx.beginPath();
+    ctx.moveTo(i,0);
+    ctx.lineTo(i+1000,1000);
+    ctx.strokeStyle="#ccc";
+    ctx.stroke();
+}
+ctx.restore();
+
+// ---------------- RØR
+ctx.beginPath();
+ctx.arc(X(0), Y(dybde - fundament - ror/2), ror/2*s, 0, Math.PI*2);
+ctx.fillStyle="orange";
+ctx.fill();
+ctx.stroke();
+
+// jordleder
+ctx.beginPath();
+ctx.arc(X(0), Y(dybde - fundament - ror/2 + 60), 5, 0, Math.PI*2);
+ctx.fill();
+
+// ---------------- MÅL FUNKSJON
+function dim(x1,y1,x2,y2,text){
+    ctx.beginPath();
+    ctx.moveTo(x1,y1);
+    ctx.lineTo(x2,y2);
+    ctx.stroke();
+
+    const ang = Math.atan2(y2-y1,x2-x1);
+
+    function arrow(x,y,dir){
+        ctx.beginPath();
+        ctx.moveTo(x,y);
+        ctx.lineTo(x - 8*Math.cos(ang-dir), y - 8*Math.sin(ang-dir));
+        ctx.lineTo(x - 8*Math.cos(ang+dir), y - 8*Math.sin(ang+dir));
+        ctx.fill();
+    }
+
+    arrow(x1,y1,0.3);
+    arrow(x2,y2,-0.3);
+
+    ctx.fillText(text,(x1+x2)/2,(y1+y2)/2-5);
+}
+
+// ---------------- MÅL
+dim(X(-bunn/2), Y(dybde+60), X(bunn/2), Y(dybde+60), bunn+" mm");
+dim(X(-topp/2), Y(-30), X(topp/2), Y(-30), Math.round(topp)+" mm");
+
+dim(X(topp/2+60), Y(0), X(topp/2+60), Y(overdekning), "min "+overdekning);
+dim(X(topp/2+60), Y(overdekning), X(topp/2+60), Y(overdekning+ledning), "min "+ledning);
+dim(X(topp/2+60), Y(dybde-fundament), X(topp/2+60), Y(dybde), fundament);
+
+// ---------------- SONER
+ctx.save();
+ctx.translate(X(-topp/2-100), Y(200));
+ctx.rotate(-Math.PI/2);
+ctx.fillText("GJENFYLLINGSSONE",0,0);
+ctx.restore();
+
+ctx.save();
+ctx.translate(X(-topp/2-100), Y(overdekning+80));
+ctx.rotate(-Math.PI/2);
+ctx.fillText("LEDNINGSSONE",0,0);
+ctx.restore();
+
+ctx.save();
+ctx.translate(X(-topp/2-100), Y(dybde-50));
+ctx.rotate(-Math.PI/2);
+ctx.fillText("NEDRE FUNDAMENT",0,0);
+ctx.restore();
+
+// ---------------- TEKST
+ctx.fillText("Merkebånd, kabeldekkbord og", X(-120), Y(120));
+ctx.fillText("skilleplate iht. gjeldende", X(-120), Y(150));
+ctx.fillText("forskrifter og kabeleiers", X(-120), Y(180));
+ctx.fillText("spesifikasjon.", X(-120), Y(210));
+
+ctx.fillText("Strøm Styreskap", X(-60), Y(overdekning+20));
+ctx.fillText("Jordavleder 25", X(-40), Y(dybde-20));
+
+}
+
 tegn();
 </script>
 
