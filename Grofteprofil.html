@@ -2,166 +2,259 @@
 <html lang="no">
 <head>
 <meta charset="UTF-8">
-<title>Grøftesnitt PRO v2</title>
+<title>Grøftesnitt PRO</title>
 <style>
-body { font-family: Arial; margin: 20px; }
-canvas { border: 1px solid #222; }
+body { font-family: Arial, sans-serif; display: flex; margin: 0; }
+.panel {
+    width: 280px;
+    padding: 20px;
+    border-right: 1px solid #ccc;
+    overflow-y: auto;
+    max-height: 100vh;
+}
+.panel h3 { margin-top: 0; }
+canvas { flex: 1; border: 1px solid #222; margin: 10px; }
+input { width: 100%; margin-bottom: 8px; padding: 4px; box-sizing: border-box; }
+label { display: block; font-size: 12px; margin-top: 10px; font-weight: bold; }
+button { width: 100%; padding: 10px; margin-top: 20px; background: #4CAF50; color: white; border: none; cursor: pointer; }
+button:hover { background: #45a049; }
 </style>
 </head>
 <body>
 
-<h2>Grøftesnitt – versjon 2</h2>
-<button onclick="tegn()">Tegn</button>
+<div class="panel">
+<h3>Parametere</h3>
 
-<canvas id="c" width="1000" height="650"></canvas>
+<label>Overdekning (mm)</label>
+<input id="overdekning" value="400" type="number">
+
+<label>Ledningssone dybde (mm)</label>
+<input id="ledning" value="150" type="number">
+
+<label>Fundament dybde (mm)</label>
+<input id="fundament" value="100" type="number">
+
+<label>Rørdiameter (mm)</label>
+<input id="ror" value="110" type="number">
+
+<label>Bunn bredde (mm)</label>
+<input id="bunn" value="310" type="number">
+
+<label>Skråningsvinkel (grader)</label>
+<input id="vinkel" value="45" type="number">
+
+<button onclick="tegn()">Tegn grøft</button>
+</div>
+
+<canvas id="c" width="1000" height="700"></canvas>
 
 <script>
-function tegn(){
 
-const ctx = document.getElementById("c").getContext("2d");
-ctx.clearRect(0,0,1000,650);
-
-// ---------------- PARAMETERE (mm)
-const overdekning = 400;
-const ledning = 150;
-const fundament = 100;
-const ror = 110;
-const side = 100;
-const vinkel = 45;
-
-// ---------------- BEREGNING
-const dybde = overdekning + ledning + fundament;
-const bunn = ror + side*2;
-const topp = bunn + 2 * dybde * Math.tan(vinkel*Math.PI/180);
-
-// ---------------- SKALA
-const s = 0.5;
-const cx = 500;
-const topY = 60;
-
-const X = x => cx + x*s;
-const Y = y => topY + y*s;
-
-// ---------------- SKRAVUR
-function hatch(areaFn){
+// Hjelpefunksjon for skravur
+function hatchPattern(ctx, pathFn, type) {
     ctx.save();
-    ctx.clip(areaFn);
-    for(let i=-1000;i<1000;i+=10){
-        ctx.beginPath();
-        ctx.moveTo(i,0);
-        ctx.lineTo(i+1000,1000);
-        ctx.strokeStyle="#aaa";
-        ctx.stroke();
+    ctx.beginPath();
+    pathFn();
+    ctx.clip();
+    ctx.strokeStyle = "#999";
+    ctx.lineWidth = 1;
+
+    if(type === "diagonal") {
+        for(let i=-500; i<1000; i+=12){
+            ctx.beginPath();
+            ctx.moveTo(i, 0);
+            ctx.lineTo(i+800, 800);
+            ctx.stroke();
+        }
     }
+
+    if(type === "cross") {
+        for(let i=-500; i<1000; i+=12){
+            ctx.beginPath();
+            ctx.moveTo(i, 0);
+            ctx.lineTo(i+800, 800);
+            ctx.stroke();
+        }
+        for(let i=-500; i<1000; i+=12){
+            ctx.beginPath();
+            ctx.moveTo(i, 800);
+            ctx.lineTo(i+800, 0);
+            ctx.stroke();
+        }
+    }
+
+    if(type === "horizontal") {
+        for(let y=0; y<800; y+=8){
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(800, y);
+            ctx.stroke();
+        }
+    }
+
     ctx.restore();
 }
 
-// ---------------- GRØFT FORM
-ctx.beginPath();
-ctx.moveTo(X(-topp/2), Y(0));
-ctx.lineTo(X(topp/2), Y(0));
-ctx.lineTo(X(bunn/2), Y(dybde-50));
+// Konverteringsfunksjoner fra mm til canvas
+function X(mm) {
+    const centerX = 450;
+    const scale = 1.2; // mm til pixels
+    return centerX + mm * scale;
+}
 
-// avrundet bunn
-ctx.quadraticCurveTo(X(0), Y(dybde+30), X(-bunn/2), Y(dybde-50));
+function Y(mm) {
+    const startY = 80;
+    const scale = 1.2;
+    return startY + mm * scale;
+}
 
-ctx.closePath();
-ctx.stroke();
-
-// ---------------- SKRAVUR MASSER
-ctx.save();
-ctx.beginPath();
-ctx.moveTo(X(-topp/2), Y(0));
-ctx.lineTo(X(topp/2), Y(0));
-ctx.lineTo(X(bunn/2), Y(dybde));
-ctx.lineTo(X(-bunn/2), Y(dybde));
-ctx.closePath();
-ctx.clip();
-
-for(let i=-500;i<1500;i+=12){
+function tegn(){
+    const canvas = document.getElementById("c");
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Hent input-verdier
+    const overdekning = parseFloat(document.getElementById("overdekning").value);
+    const ledning = parseFloat(document.getElementById("ledning").value);
+    const fundament = parseFloat(document.getElementById("fundament").value);
+    const ror = parseFloat(document.getElementById("ror").value);
+    const bunn = parseFloat(document.getElementById("bunn").value);
+    const vinkel = parseFloat(document.getElementById("vinkel").value);
+    
+    // Beregner dimensjoner
+    const totalDybde = overdekning + ledning + fundament;
+    const radius = ror / 2;
+    const vinkelRad = (vinkel * Math.PI) / 180;
+    const topBredde = bunn + 2 * totalDybde * Math.tan(vinkelRad);
+    
+    // Overkant
+    ctx.strokeStyle = "#000";
+    ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(i,0);
-    ctx.lineTo(i+1000,1000);
-    ctx.strokeStyle="#ccc";
+    ctx.moveTo(X(-topBredde/2), Y(0));
+    ctx.lineTo(X(topBredde/2), Y(0));
     ctx.stroke();
-}
-ctx.restore();
-
-// ---------------- RØR
-ctx.beginPath();
-ctx.arc(X(0), Y(dybde - fundament - ror/2), ror/2*s, 0, Math.PI*2);
-ctx.fillStyle="orange";
-ctx.fill();
-ctx.stroke();
-
-// jordleder
-ctx.beginPath();
-ctx.arc(X(0), Y(dybde - fundament - ror/2 + 60), 5, 0, Math.PI*2);
-ctx.fill();
-
-// ---------------- MÅL FUNKSJON
-function dim(x1,y1,x2,y2,text){
+    
+    // Skråninger og bunn
     ctx.beginPath();
-    ctx.moveTo(x1,y1);
-    ctx.lineTo(x2,y2);
+    ctx.moveTo(X(-topBredde/2), Y(0));
+    ctx.lineTo(X(-bunn/2), Y(totalDybde));
+    ctx.lineTo(X(bunn/2), Y(totalDybde));
+    ctx.lineTo(X(topBredde/2), Y(0));
     ctx.stroke();
-
-    const ang = Math.atan2(y2-y1,x2-x1);
-
-    function arrow(x,y,dir){
-        ctx.beginPath();
-        ctx.moveTo(x,y);
-        ctx.lineTo(x - 8*Math.cos(ang-dir), y - 8*Math.sin(ang-dir));
-        ctx.lineTo(x - 8*Math.cos(ang+dir), y - 8*Math.sin(ang+dir));
-        ctx.fill();
-    }
-
-    arrow(x1,y1,0.3);
-    arrow(x2,y2,-0.3);
-
-    ctx.fillText(text,(x1+x2)/2,(y1+y2)/2-5);
+    
+    // SKRAVUR - Gjenfyllingssone
+    hatchPattern(ctx, () => {
+        ctx.moveTo(X(-topBredde/2), Y(0));
+        ctx.lineTo(X(topBredde/2), Y(0));
+        ctx.lineTo(X(topBredde/2 - overdekning * Math.tan(vinkelRad)), Y(overdekning));
+        ctx.lineTo(X(-topBredde/2 + overdekning * Math.tan(vinkelRad)), Y(overdekning));
+        ctx.closePath();
+    }, "diagonal");
+    
+    // SKRAVUR - Ledningssone
+    hatchPattern(ctx, () => {
+        ctx.moveTo(X(topBredde/2 - overdekning * Math.tan(vinkelRad)), Y(overdekning));
+        ctx.lineTo(X(-topBredde/2 + overdekning * Math.tan(vinkelRad)), Y(overdekning));
+        ctx.lineTo(X(-bunn/2), Y(overdekning + ledning));
+        ctx.lineTo(X(bunn/2), Y(overdekning + ledning));
+        ctx.closePath();
+    }, "cross");
+    
+    // SKRAVUR - Fundament
+    hatchPattern(ctx, () => {
+        ctx.moveTo(X(-bunn/2), Y(totalDybde - fundament));
+        ctx.lineTo(X(bunn/2), Y(totalDybde - fundament));
+        ctx.lineTo(X(bunn/2), Y(totalDybde));
+        ctx.lineTo(X(-bunn/2), Y(totalDybde));
+        ctx.closePath();
+    }, "horizontal");
+    
+    // RØR
+    ctx.beginPath();
+    ctx.arc(X(0), Y(overdekning + ledning + fundament/2), radius * 1.2, 0, Math.PI * 2);
+    ctx.fillStyle = "orange";
+    ctx.fill();
+    ctx.strokeStyle = "#000";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    
+    // Dimensjonslinjer
+    ctx.strokeStyle = "#000";
+    ctx.fillStyle = "#000";
+    ctx.font = "12px Arial";
+    ctx.textAlign = "center";
+    
+    // Bunn-bredde
+    ctx.beginPath();
+    ctx.moveTo(X(-bunn/2), Y(totalDybde + 30));
+    ctx.lineTo(X(bunn/2), Y(totalDybde + 30));
+    ctx.stroke();
+    ctx.fillText(Math.round(bunn) + " mm", X(0), Y(totalDybde + 50));
+    
+    // Dybdemål
+    ctx.strokeStyle = "#000";
+    ctx.textAlign = "right";
+    ctx.font = "11px Arial";
+    
+    // Overdekning
+    ctx.beginPath();
+    ctx.moveTo(X(-topBredde/2 - 40), Y(0));
+    ctx.lineTo(X(-topBredde/2 - 40), Y(overdekning));
+    ctx.stroke();
+    ctx.fillText(Math.round(overdekning), X(-topBredde/2 - 50), Y(overdekning/2));
+    
+    // Ledningssone
+    ctx.beginPath();
+    ctx.moveTo(X(-topBredde/2 - 40), Y(overdekning));
+    ctx.lineTo(X(-topBredde/2 - 40), Y(overdekning + ledning));
+    ctx.stroke();
+    ctx.fillText(Math.round(ledning), X(-topBredde/2 - 50), Y(overdekning + ledning/2));
+    
+    // Fundament
+    ctx.beginPath();
+    ctx.moveTo(X(-topBredde/2 - 40), Y(overdekning + ledning));
+    ctx.lineTo(X(-topBredde/2 - 40), Y(totalDybde));
+    ctx.stroke();
+    ctx.fillText(Math.round(fundament), X(-topBredde/2 - 50), Y(overdekning + ledning + fundament/2));
+    
+    // TEKST
+    ctx.fillStyle = "#333";
+    ctx.textAlign = "center";
+    ctx.font = "bold 12px Arial";
+    
+    // Tekstlabels på siden
+    ctx.save();
+    ctx.translate(X(-topBredde/2 - 100), Y(overdekning/2));
+    ctx.rotate(-Math.PI/2);
+    ctx.textAlign = "center";
+    ctx.fillText("GJENFYLLINGSSONE", 0, 0);
+    ctx.restore();
+    
+    ctx.save();
+    ctx.translate(X(-topBredde/2 - 100), Y(overdekning + ledning/2));
+    ctx.rotate(-Math.PI/2);
+    ctx.textAlign = "center";
+    ctx.fillText("LEDNINGSSONE", 0, 0);
+    ctx.restore();
+    
+    ctx.save();
+    ctx.translate(X(-topBredde/2 - 100), Y(overdekning + ledning + fundament/2));
+    ctx.rotate(-Math.PI/2);
+    ctx.textAlign = "center";
+    ctx.fillText("NEDRE FUNDAMENT", 0, 0);
+    ctx.restore();
+    
+    ctx.textAlign = "center";
+    ctx.font = "11px Arial";
+    ctx.fillText("Strøm Styreskap", X(0), Y(overdekning + ledning + fundament/2) + 30);
 }
 
-// ---------------- MÅL
-dim(X(-bunn/2), Y(dybde+60), X(bunn/2), Y(dybde+60), bunn+" mm");
-dim(X(-topp/2), Y(-30), X(topp/2), Y(-30), Math.round(topp)+" mm");
-
-dim(X(topp/2+60), Y(0), X(topp/2+60), Y(overdekning), "min "+overdekning);
-dim(X(topp/2+60), Y(overdekning), X(topp/2+60), Y(overdekning+ledning), "min "+ledning);
-dim(X(topp/2+60), Y(dybde-fundament), X(topp/2+60), Y(dybde), fundament);
-
-// ---------------- SONER
-ctx.save();
-ctx.translate(X(-topp/2-100), Y(200));
-ctx.rotate(-Math.PI/2);
-ctx.fillText("GJENFYLLINGSSONE",0,0);
-ctx.restore();
-
-ctx.save();
-ctx.translate(X(-topp/2-100), Y(overdekning+80));
-ctx.rotate(-Math.PI/2);
-ctx.fillText("LEDNINGSSONE",0,0);
-ctx.restore();
-
-ctx.save();
-ctx.translate(X(-topp/2-100), Y(dybde-50));
-ctx.rotate(-Math.PI/2);
-ctx.fillText("NEDRE FUNDAMENT",0,0);
-ctx.restore();
-
-// ---------------- TEKST
-ctx.fillText("Merkebånd, kabeldekkbord og", X(-120), Y(120));
-ctx.fillText("skilleplate iht. gjeldende", X(-120), Y(150));
-ctx.fillText("forskrifter og kabeleiers", X(-120), Y(180));
-ctx.fillText("spesifikasjon.", X(-120), Y(210));
-
-ctx.fillText("Strøm Styreskap", X(-60), Y(overdekning+20));
-ctx.fillText("Jordavleder 25", X(-40), Y(dybde-20));
-
-}
-
+// Tegn ved start
 tegn();
 </script>
+
+
 
 </body>
 </html>
