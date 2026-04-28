@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<title>Grøftesnitt Generator</title>
+<style>
+    body { font-family: Arial; margin: 20px; }
+    input { margin: 5px; }
+    canvas { border: 1px solid #333; margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<h2>Grøftesnitt Generator</h2>
+
+<label>Overdekning (m):</label>
+<input id="overdekning" type="number" value="0.6" step="0.1"><br>
+
+<label>Rørdiametre (m, kommaseparert):</label>
+<input id="ror" type="text" value="0.11,0.11,0.11"><br>
+
+<label>Avstand mellom rør (m):</label>
+<input id="avstand" type="number" value="0.05" step="0.01"><br>
+
+<label>Fundament (m):</label>
+<input id="fundament" type="number" value="0.1" step="0.01"><br>
+
+<label>Skråningsvinkel (grader):</label>
+<input id="vinkel" type="number" value="45"><br>
+
+<br>
+<button onclick="tegn()">Tegn grøft</button>
+
+<canvas id="canvas" width="800" height="500"></canvas>
+
+<script>
+function tegn() {
+    const overdekning = parseFloat(document.getElementById("overdekning").value);
+    const ror = document.getElementById("ror").value.split(",").map(Number);
+    const avstand = parseFloat(document.getElementById("avstand").value);
+    const fundament = parseFloat(document.getElementById("fundament").value);
+    const vinkel = parseFloat(document.getElementById("vinkel").value);
+
+    const maksDiameter = Math.max(...ror);
+
+    const dybde = overdekning + maksDiameter + fundament;
+    const bunnbredde = ror.reduce((a,b) => a+b, 0) + avstand * (ror.length - 1);
+
+    const theta = vinkel * Math.PI / 180;
+    const toppbredde = bunnbredde + 2 * dybde * Math.tan(theta);
+
+    console.log("Dybde:", dybde);
+    console.log("Bunnbredde:", bunnbredde);
+    console.log("Toppbredde:", toppbredde);
+
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Skalering
+    const scale = 300; // px per meter
+
+    const centerX = canvas.width / 2;
+    const topY = 50;
+
+    // Konverter til canvas-koordinater
+    function X(x) { return centerX + x * scale; }
+    function Y(y) { return topY + y * scale; }
+
+    // Tegn grøft
+    ctx.beginPath();
+    ctx.moveTo(X(-toppbredde/2), Y(0));
+    ctx.lineTo(X(toppbredde/2), Y(0));
+    ctx.lineTo(X(bunnbredde/2), Y(dybde));
+    ctx.lineTo(X(-bunnbredde/2), Y(dybde));
+    ctx.closePath();
+    ctx.stroke();
+
+    // Tegn rør
+    let currentX = -bunnbredde / 2;
+
+    ror.forEach(diameter => {
+        const radius = diameter / 2;
+        const cx = currentX + radius;
+        const cy = dybde - fundament - radius;
+
+        ctx.beginPath();
+        ctx.arc(X(cx), Y(cy), radius * scale, 0, 2 * Math.PI);
+        ctx.stroke();
+
+        currentX += diameter + avstand;
+    });
+
+    // Tekst
+    ctx.fillText(`Dybde: ${dybde.toFixed(2)} m`, 10, 20);
+    ctx.fillText(`Toppbredde: ${toppbredde.toFixed(2)} m`, 10, 40);
+}
+
+// Tegn ved start
+tegn();
+</script>
+
+</body>
+</html>
