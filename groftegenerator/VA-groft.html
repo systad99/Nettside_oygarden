@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<title>VA-grøft Generator</title>
+<style>
+    * { box-sizing: border-box; }
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background: #f5f7f8;
+        color: #1f2528;
+    }
+    main {
+        display: grid;
+        grid-template-columns: 330px minmax(0, 1fr);
+        min-height: 100vh;
+    }
+    .panel {
+        background: #fff;
+        border-right: 1px solid #d4dde1;
+        padding: 20px;
+        overflow-y: auto;
+    }
+    h1 {
+        font-size: 22px;
+        margin: 0 0 16px;
+    }
+    h2 {
+        font-size: 15px;
+        margin: 20px 0 8px;
+        border-top: 1px solid #e0e6e9;
+        padding-top: 14px;
+    }
+    label {
+        display: block;
+        font-size: 13px;
+        font-weight: bold;
+        margin-top: 12px;
+    }
+    input {
+        width: 100%;
+        margin-top: 5px;
+        padding: 8px;
+        border: 1px solid #b9c5ca;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+    .toggle {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 8px;
+        align-items: center;
+        margin-top: 12px;
+        font-size: 13px;
+        font-weight: bold;
+    }
+    .toggle input {
+        width: auto;
+        margin: 0;
+    }
+    button {
+        width: 100%;
+        margin-top: 18px;
+        padding: 10px 12px;
+        border: 0;
+        border-radius: 4px;
+        background: #2f6c86;
+        color: #fff;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    button:hover { background: #25576c; }
+    .summary {
+        margin-top: 18px;
+        padding: 12px;
+        background: #edf5f8;
+        border: 1px solid #d3e4eb;
+        border-radius: 4px;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+    .note {
+        color: #526169;
+        font-size: 12px;
+        line-height: 1.4;
+        margin-top: 10px;
+    }
+    .drawing {
+        padding: 20px;
+        overflow: auto;
+    }
+    canvas {
+        width: 100%;
+        max-width: 1200px;
+        height: auto;
+        background: #fffefa;
+        border: 1px solid #2d3336;
+    }
+    @media (max-width: 820px) {
+        main { grid-template-columns: 1fr; }
+        .panel { border-right: 0; border-bottom: 1px solid #d4dde1; }
+    }
+</style>
+</head>
+<body>
+<main>
+    <section class="panel">
+        <h1>VA-grøft Generator</h1>
+
+        <label for="overdekning">Overdekning til øverste rør (m)</label>
+        <input id="overdekning" type="number" value="1.20" step="0.05" min="0">
+
+        <label for="vinkel">Skråningsvinkel (grader)</label>
+        <input id="vinkel" type="number" value="45" min="0" max="80">
+
+        <h2>Rør</h2>
+        <label for="dnVann">Vannledning DN (mm)</label>
+        <input id="dnVann" type="number" value="160" step="10" min="0">
+
+        <label for="dnSpill">Spillvann DN (mm)</label>
+        <input id="dnSpill" type="number" value="160" step="10" min="0">
+
+        <label class="toggle">
+            <input id="visOvervann" type="checkbox" checked>
+            <span>Ta med overvannsledning</span>
+        </label>
+
+        <label for="dnOvervann">Overvann DN (mm)</label>
+        <input id="dnOvervann" type="number" value="200" step="10" min="0">
+
+        <h2>Krav og standardverdier</h2>
+        <label for="fundament">Fundament under laveste rør (m)</label>
+        <input id="fundament" type="number" value="0.15" step="0.05" min="0">
+
+        <label for="vertikalAvstand">Vertikal avstand mellom rør (m)</label>
+        <input id="vertikalAvstand" type="number" value="0.15" step="0.05" min="0">
+
+        <label for="beskyttelseslag">Beskyttelseslag over øverste rør (m)</label>
+        <input id="beskyttelseslag" type="number" value="0.30" step="0.05" min="0">
+
+        <label for="sideAvstand">Sideavstand til grøftevegg (m, automatisk)</label>
+        <input id="sideAvstand" type="text" value="0.20" readonly>
+
+        <button onclick="tegn()">Tegn VA-grøft</button>
+
+        <div class="summary" id="summary"></div>
+        <p class="note">Standardverdier er veiledende. Sjekk alltid aktuell kommunal VA-norm, geoteknikk og prosjekteringsgrunnlag.</p>
+    </section>
+
+    <section class="drawing">
+        <canvas id="canvas" width="1200" height="760"></canvas>
+    </section>
+</main>
+
+<script>
+function meter(valueMm) {
+    return valueMm / 1000;
+}
+
+function formatMeter(value) {
+    return `${value.toFixed(2)} m`;
+}
+
+function formatDn(value) {
+    return `DN ${Math.round(value)}`;
+}
+
+function avstandskrav(diameterMm) {
+    if (diameterMm <= 225) return { side: 0.20, mellom: 0.20, vertikal: 0.15 };
+    if (diameterMm <= 350) return { side: 0.25, mellom: 0.20, vertikal: 0.15 };
+    if (diameterMm <= 700) return { side: 0.35, mellom: 0.25, vertikal: 0.15 };
+    if (diameterMm <= 1200) return { side: 0.425, mellom: 0.40, vertikal: 0.15 };
+    return { side: 0.50, mellom: 0.50, vertikal: 0.15 };
+}
+
+function tegn() {
+    const overdekning = parseFloat(document.getElementById("overdekning").value) || 0;
+    const vinkel = parseFloat(document.getElementById("vinkel").value) || 0;
+    const fundament = parseFloat(document.getElementById("fundament").value) || 0;
+    const vertikalAvstandInput = parseFloat(document.getElementById("vertikalAvstand").value) || 0;
+    const beskyttelseslag = parseFloat(document.getElementById("beskyttelseslag").value) || 0;
+    const dnVann = parseFloat(document.getElementById("dnVann").value) || 0;
+    const dnSpill = parseFloat(document.getElementById("dnSpill").value) || 0;
+    const dnOvervann = parseFloat(document.getElementById("dnOvervann").value) || 0;
+    const visOvervann = document.getElementById("visOvervann").checked;
+
+    const pipes = [
+        { key: "spill", navn: "Spillvann", dn: dnSpill, color: "#c75146", order: 0 },
+        ...(visOvervann ? [{ key: "overvann", navn: "Overvann", dn: dnOvervann, color: "#5f8fba", order: 1 }] : []),
+        { key: "vann", navn: "Vann", dn: dnVann, color: "#2d77b3", order: 2 }
+    ].filter(pipe => pipe.dn > 0);
+
+    if (!pipes.some(pipe => pipe.key === "spill")) {
+        document.getElementById("summary").textContent = "Legg inn spillvannsrør. Spillvann skal ligge lavest.";
+        return;
+    }
+
+    const maxDn = Math.max(...pipes.map(pipe => pipe.dn));
+    const krav = avstandskrav(maxDn);
+    const sideAvstand = krav.side;
+    const vertikalAvstand = Math.max(vertikalAvstandInput, krav.vertikal);
+    document.getElementById("sideAvstand").value = sideAvstand.toFixed(2);
+    document.getElementById("vertikalAvstand").value = vertikalAvstand.toFixed(2);
+
+    let topOfCurrentPipe = null;
+    pipes.forEach((pipe, index) => {
+        pipe.diameter = meter(pipe.dn);
+        pipe.radius = pipe.diameter / 2;
+
+        if (index === 0) {
+            pipe.cy = 0;
+        } else {
+            pipe.cy = topOfCurrentPipe - vertikalAvstand - pipe.radius;
+        }
+
+        pipe.bottom = pipe.cy + pipe.radius;
+        pipe.top = pipe.cy - pipe.radius;
+        topOfCurrentPipe = pipe.top;
+    });
+
+    const lowestBottom = Math.max(...pipes.map(pipe => pipe.bottom));
+    const highestTop = Math.min(...pipes.map(pipe => pipe.top));
+
+    pipes.forEach(pipe => {
+        pipe.y = pipe.cy - highestTop + overdekning;
+    });
+
+    const toppLedningssone = Math.max(0, overdekning - beskyttelseslag);
+    const bunnLedningssone = lowestBottom - highestTop + overdekning + fundament;
+    const dybde = bunnLedningssone;
+    const maxDiameter = Math.max(...pipes.map(pipe => pipe.diameter));
+    const breddeVedRor = maxDiameter + sideAvstand * 2;
+    const theta = vinkel * Math.PI / 180;
+    const bunnbredde = Math.max(0.10, breddeVedRor - 2 * fundament * Math.tan(theta));
+    const toppbredde = breddeVedRor + 2 * (dybde - fundament) * Math.tan(theta);
+
+    document.getElementById("summary").innerHTML = `
+        Dybde: <strong>${formatMeter(dybde)}</strong><br>
+        Overdekning: <strong>${formatMeter(overdekning)}</strong><br>
+        Fundament: <strong>${formatMeter(fundament)}</strong><br>
+        Sideavstand: <strong>${formatMeter(sideAvstand)}</strong><br>
+        Vertikal avstand: <strong>${formatMeter(vertikalAvstand)}</strong><br>
+        Spillvann ligger lavest: <strong>ja</strong>
+    `;
+
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const margin = { left: 170, right: 210, top: 90, bottom: 120 };
+    const availableWidth = canvas.width - margin.left - margin.right;
+    const availableHeight = canvas.height - margin.top - margin.bottom;
+    const scale = Math.min(availableWidth / Math.max(toppbredde, 0.1), availableHeight / Math.max(dybde, 0.1));
+    const centerX = canvas.width / 2 - 40;
+    const topY = margin.top;
+
+    function X(x) { return centerX + x * scale; }
+    function Y(y) { return topY + y * scale; }
+
+    function trenchWidthAtDepth(y) {
+        if (y <= dybde - fundament) {
+            return breddeVedRor + 2 * (dybde - fundament - y) * Math.tan(theta);
+        }
+
+        const ratio = fundament > 0 ? (dybde - y) / fundament : 0;
+        return bunnbredde + (breddeVedRor - bunnbredde) * ratio;
+    }
+
+    function label(text, x, y, align = "center", weight = "normal") {
+        ctx.fillStyle = "#111";
+        ctx.font = `${weight} 14px Arial`;
+        ctx.textAlign = align;
+        ctx.textBaseline = "middle";
+        ctx.fillText(text, x, y);
+    }
+
+    function dimension(x1, y1, x2, y2, text, textOffsetX = 0, textOffsetY = -12) {
+        ctx.save();
+        ctx.strokeStyle = "#111";
+        ctx.fillStyle = "#111";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+
+        const angle = Math.atan2(y2 - y1, x2 - x1);
+        [0, 1].forEach(end => {
+            const x = end ? x2 : x1;
+            const y = end ? y2 : y1;
+            const dir = end ? angle + Math.PI : angle;
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x + Math.cos(dir + 0.45) * 10, y + Math.sin(dir + 0.45) * 10);
+            ctx.lineTo(x + Math.cos(dir - 0.45) * 10, y + Math.sin(dir - 0.45) * 10);
+            ctx.closePath();
+            ctx.fill();
+        });
+
+        if (text) {
+            label(text, (x1 + x2) / 2 + textOffsetX, (y1 + y2) / 2 + textOffsetY);
+        }
+
+        ctx.restore();
+    }
+
+    function horizontalBoundary(y, text) {
+        const width = trenchWidthAtDepth(y);
+        ctx.save();
+        ctx.setLineDash([8, 5]);
+        ctx.strokeStyle = "#777";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(X(-width / 2), Y(y));
+        ctx.lineTo(X(width / 2), Y(y));
+        ctx.stroke();
+        ctx.setLineDash([]);
+        label(text, X(width / 2) + 14, Y(y), "left", "bold");
+        ctx.restore();
+    }
+
+    ctx.fillStyle = "#eee7d3";
+    ctx.strokeStyle = "#222";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(X(-toppbredde / 2), Y(0));
+    ctx.lineTo(X(toppbredde / 2), Y(0));
+    ctx.lineTo(X(breddeVedRor / 2), Y(dybde - fundament));
+    ctx.lineTo(X(bunnbredde / 2), Y(dybde));
+    ctx.lineTo(X(-bunnbredde / 2), Y(dybde));
+    ctx.lineTo(X(-breddeVedRor / 2), Y(dybde - fundament));
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    horizontalBoundary(toppLedningssone, "Ledningssone");
+    horizontalBoundary(dybde - fundament, "Topp fundament");
+
+    pipes.forEach(pipe => {
+        ctx.beginPath();
+        ctx.arc(X(0), Y(pipe.y), pipe.radius * scale, 0, Math.PI * 2);
+        ctx.fillStyle = pipe.color;
+        ctx.fill();
+        ctx.strokeStyle = "#111";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        label(pipe.navn, X(0), Y(pipe.y), "center", "bold");
+        label(formatDn(pipe.dn), X(0), Y(pipe.y - pipe.radius - 0.05));
+    });
+
+    pipes.slice(0, -1).forEach((pipe, index) => {
+        const nextPipe = pipes[index + 1];
+        const x = X(-breddeVedRor / 2) - 34 - index * 34;
+        dimension(x, Y(nextPipe.y + nextPipe.radius), x, Y(pipe.y - pipe.radius), formatMeter(vertikalAvstand), -42, 0);
+    });
+
+    dimension(X(-toppbredde / 2), Y(0) - 34, X(toppbredde / 2), Y(0) - 34, `Toppbredde ${formatMeter(toppbredde)}`);
+    dimension(X(-bunnbredde / 2), Y(dybde) + 24, X(bunnbredde / 2), Y(dybde) + 24, `Bunnbredde ${formatMeter(bunnbredde)}`, 0, 16);
+    dimension(X(-breddeVedRor / 2), Y(pipes[0].y), X(-pipes[0].radius), Y(pipes[0].y), `Sideavstand ${formatMeter(sideAvstand)}`, 0, -14);
+    dimension(X(pipes[0].radius), Y(pipes[0].y), X(breddeVedRor / 2), Y(pipes[0].y), formatMeter(sideAvstand), 0, -14);
+
+    const dimX = X(toppbredde / 2) + 70;
+    dimension(dimX, Y(0), dimX, Y(dybde), `Dybde ${formatMeter(dybde)}`, 60, 0);
+    dimension(dimX + 60, Y(0), dimX + 60, Y(pipes[pipes.length - 1].y - pipes[pipes.length - 1].radius), `Overdekning ${formatMeter(overdekning)}`, 86, 0);
+    dimension(dimX + 60, Y(dybde - fundament), dimX + 60, Y(dybde), `Fundament ${formatMeter(fundament)}`, 74, 0);
+}
+
+document.querySelectorAll("input").forEach(input => input.addEventListener("input", tegn));
+tegn();
+</script>
+</body>
+</html>

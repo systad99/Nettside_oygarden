@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<title>Grøftesnitt Generator</title>
+<style>
+    * { box-sizing: border-box; }
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background: #f6f7f4;
+        color: #20231f;
+    }
+    main {
+        display: grid;
+        grid-template-columns: 300px minmax(0, 1fr);
+        min-height: 100vh;
+    }
+    .panel {
+        background: #ffffff;
+        border-right: 1px solid #d8ddd2;
+        padding: 20px;
+    }
+    h1 {
+        font-size: 22px;
+        margin: 0 0 18px;
+    }
+    label {
+        display: block;
+        font-size: 13px;
+        font-weight: bold;
+        margin-top: 12px;
+    }
+    input {
+        width: 100%;
+        margin-top: 5px;
+        padding: 8px;
+        border: 1px solid #bfc8b8;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+    button {
+        width: 100%;
+        margin-top: 18px;
+        padding: 10px 12px;
+        border: 0;
+        border-radius: 4px;
+        background: #2f6f4e;
+        color: #fff;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    button:hover { background: #265a40; }
+    .summary {
+        margin-top: 18px;
+        padding: 12px;
+        background: #eef4ea;
+        border: 1px solid #d7e4d0;
+        border-radius: 4px;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+    .drawing {
+        padding: 20px;
+        overflow: auto;
+    }
+    canvas {
+        width: 100%;
+        max-width: 1100px;
+        height: auto;
+        background: #fffefa;
+        border: 1px solid #333;
+    }
+    @media (max-width: 760px) {
+        main { grid-template-columns: 1fr; }
+        .panel { border-right: 0; border-bottom: 1px solid #d8ddd2; }
+    }
+</style>
+</head>
+<body>
+<main>
+    <section class="panel">
+        <h1>Grøftesnitt Generator</h1>
+
+        <label for="overdekning">Overdekning (m)</label>
+        <input id="overdekning" type="number" value="0.6" step="0.1" min="0">
+
+        <label for="ror">Rørdiametre (m, kommaseparert)</label>
+        <input id="ror" type="text" value="0.11,0.11,0.11">
+
+        <label for="avstand">Avstand mellom rør (m, automatisk)</label>
+        <input id="avstand" type="text" value="0.11, 0.11" readonly>
+
+        <label for="fundament">Fundament (m)</label>
+        <input id="fundament" type="number" value="0.1" step="0.01" min="0">
+
+        <label for="vinkel">Skråningsvinkel (grader)</label>
+        <input id="vinkel" type="number" value="45" min="0" max="80">
+
+        <button onclick="tegn()">Tegn grøft</button>
+
+        <div class="summary" id="summary"></div>
+    </section>
+
+    <section class="drawing">
+        <canvas id="canvas" width="1100" height="700"></canvas>
+    </section>
+</main>
+
+<script>
+function parseRor(value) {
+    return value
+        .split(",")
+        .map(item => parseFloat(item.trim()))
+        .filter(diameter => Number.isFinite(diameter) && diameter > 0);
+}
+
+function formatMeter(value) {
+    return `${value.toFixed(2)} m`;
+}
+
+function pipeGap(leftDiameter, rightDiameter) {
+    return Math.max(leftDiameter, rightDiameter);
+}
+
+function tegn() {
+    const overdekning = parseFloat(document.getElementById("overdekning").value) || 0;
+    const ror = parseRor(document.getElementById("ror").value);
+    const fundament = parseFloat(document.getElementById("fundament").value) || 0;
+    const vinkel = parseFloat(document.getElementById("vinkel").value) || 0;
+
+    if (ror.length === 0) {
+        document.getElementById("summary").textContent = "Legg inn minst én gyldig rørdiameter.";
+        return;
+    }
+
+    const sideklaring = 0.10;
+    const dekningOverRor = 0.15;
+    const maksDiameter = Math.max(...ror);
+    const dybde = overdekning + dekningOverRor + maksDiameter + fundament;
+    const rorAvstander = ror.slice(0, -1).map((diameter, index) => pipeGap(diameter, ror[index + 1]));
+    const rorPakkeBredde = ror.reduce((sum, diameter) => sum + diameter, 0)
+        + rorAvstander.reduce((sum, gap) => sum + gap, 0);
+    document.getElementById("avstand").value = rorAvstander.length
+        ? rorAvstander.map(gap => gap.toFixed(2)).join(", ")
+        : "0.00";
+    const theta = vinkel * Math.PI / 180;
+    const breddeVedToppFundament = rorPakkeBredde + sideklaring * 2;
+    const beregnetBunnbredde = breddeVedToppFundament - 2 * fundament * Math.tan(theta);
+    const bunnbredde = Math.max(0.02, beregnetBunnbredde);
+    const toppbredde = breddeVedToppFundament + 2 * (dybde - fundament) * Math.tan(theta);
+
+    document.getElementById("summary").innerHTML = `
+        Dybde: <strong>${formatMeter(dybde)}</strong><br>
+        Bunnbredde: <strong>${formatMeter(bunnbredde)}</strong><br>
+        Røravstander: <strong>${rorAvstander.length ? rorAvstander.map(formatMeter).join(", ") : formatMeter(0)}</strong><br>
+        Dekning over høyeste rør: <strong>${formatMeter(dekningOverRor)}</strong><br>
+        Bredde ved topp fundament: <strong>${formatMeter(breddeVedToppFundament)}</strong><br>
+        Sideklaring: <strong>${formatMeter(sideklaring)}</strong><br>
+        Toppbredde: <strong>${formatMeter(toppbredde)}</strong>
+    `;
+
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const margin = { left: 140, right: 190, top: 90, bottom: 130 };
+    const availableWidth = canvas.width - margin.left - margin.right;
+    const availableHeight = canvas.height - margin.top - margin.bottom;
+    const scale = Math.min(availableWidth / Math.max(toppbredde, 0.1), availableHeight / Math.max(dybde, 0.1));
+    const centerX = canvas.width / 2 - 30;
+    const topY = margin.top;
+
+    function X(x) { return centerX + x * scale; }
+    function Y(y) { return topY + y * scale; }
+
+    function label(text, x, y, align = "center", weight = "normal") {
+        ctx.fillStyle = "#111";
+        ctx.font = `${weight} 14px Arial`;
+        ctx.textAlign = align;
+        ctx.textBaseline = "middle";
+        ctx.fillText(text, x, y);
+    }
+
+    function labelIfInsideTrench(text, xMeter, yMeter, weight = "normal") {
+        ctx.font = `${weight} 14px Arial`;
+        const textWidthMeter = ctx.measureText(text).width / scale;
+        const halfAvailableWidth = trenchWidthAtDepth(yMeter) / 2 - 0.04;
+
+        if (Math.abs(xMeter) + textWidthMeter / 2 <= halfAvailableWidth) {
+            label(text, X(xMeter), Y(yMeter), "center", weight);
+        }
+    }
+
+    function dimension(x1, y1, x2, y2, text, textOffsetX = 0, textOffsetY = -12) {
+        ctx.save();
+        ctx.strokeStyle = "#111";
+        ctx.fillStyle = "#111";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+
+        const angle = Math.atan2(y2 - y1, x2 - x1);
+        [0, 1].forEach(end => {
+            const x = end ? x2 : x1;
+            const y = end ? y2 : y1;
+            const dir = end ? angle + Math.PI : angle;
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x + Math.cos(dir + 0.45) * 10, y + Math.sin(dir + 0.45) * 10);
+            ctx.lineTo(x + Math.cos(dir - 0.45) * 10, y + Math.sin(dir - 0.45) * 10);
+            ctx.closePath();
+            ctx.fill();
+        });
+
+        label(text, (x1 + x2) / 2 + textOffsetX, (y1 + y2) / 2 + textOffsetY);
+        ctx.restore();
+    }
+
+    function gapDimension(leftEdgeMeter, rightEdgeMeter, yMeter, text, leaderIndex) {
+        const arrowY = Y(yMeter);
+        const midX = (X(leftEdgeMeter) + X(rightEdgeMeter)) / 2;
+        const labelY = Y(dybde) + 76 + (leaderIndex % 2) * 24;
+
+        dimension(X(leftEdgeMeter), arrowY, X(rightEdgeMeter), arrowY, "", 0, 0);
+
+        ctx.save();
+        ctx.strokeStyle = "#111";
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(midX, arrowY);
+        ctx.lineTo(midX, labelY - 10);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        label(text, midX, labelY);
+        ctx.restore();
+    }
+
+    function horizontalBoundary(y, width) {
+        ctx.setLineDash([8, 5]);
+        ctx.strokeStyle = "#777";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(X(-width / 2), Y(y));
+        ctx.lineTo(X(width / 2), Y(y));
+        ctx.stroke();
+        ctx.setLineDash([]);
+    }
+
+    function trenchWidthAtDepth(y) {
+        if (y === dybde - fundament) {
+            return breddeVedToppFundament;
+        }
+
+        if (y < dybde - fundament) {
+            return breddeVedToppFundament + 2 * (dybde - fundament - y) * Math.tan(theta);
+        }
+
+        const fundamentRatio = fundament > 0 ? (dybde - y) / fundament : 0;
+        return bunnbredde + (breddeVedToppFundament - bunnbredde) * fundamentRatio;
+    }
+
+    ctx.fillStyle = "#f2ede1";
+    ctx.strokeStyle = "#222";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(X(-toppbredde / 2), Y(0));
+    ctx.lineTo(X(toppbredde / 2), Y(0));
+    ctx.lineTo(X(breddeVedToppFundament / 2), Y(dybde - fundament));
+    ctx.lineTo(X(bunnbredde / 2), Y(dybde));
+    ctx.lineTo(X(-bunnbredde / 2), Y(dybde));
+    ctx.lineTo(X(-breddeVedToppFundament / 2), Y(dybde - fundament));
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    const widthAtOverdekning = toppbredde - 2 * overdekning * Math.tan(theta);
+    horizontalBoundary(overdekning, widthAtOverdekning);
+    horizontalBoundary(dybde - fundament, trenchWidthAtDepth(dybde - fundament));
+
+    labelIfInsideTrench("Gjenfylling", 0, overdekning / 2, "bold");
+
+    let currentX = -rorPakkeBredde / 2;
+    const pipePositions = [];
+
+    ror.forEach((diameter, index) => {
+        const radius = diameter / 2;
+        const cx = currentX + radius;
+        const cy = overdekning + dekningOverRor + maksDiameter - radius;
+        pipePositions.push({ cx, cy, radius, diameter });
+
+        ctx.beginPath();
+        ctx.arc(X(cx), Y(cy), radius * scale, 0, 2 * Math.PI);
+        ctx.fillStyle = "#f2a23a";
+        ctx.fill();
+        ctx.strokeStyle = "#111";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        const pipeLabel = diameter * scale > 42 ? `Rør ${index + 1}` : `${index + 1}`;
+        labelIfInsideTrench(pipeLabel, cx, cy, "bold");
+
+        const diameterLabelY = cy - radius - 0.04;
+        labelIfInsideTrench(`Ø ${formatMeter(diameter)}`, cx, diameterLabelY);
+
+        currentX += diameter + (rorAvstander[index] || 0);
+    });
+
+    pipePositions.slice(0, -1).forEach((pipe, index) => {
+        const nextPipe = pipePositions[index + 1];
+        const leftEdge = pipe.cx + pipe.radius;
+        const rightEdge = nextPipe.cx - nextPipe.radius;
+        const gapY = Math.min(pipe.cy, nextPipe.cy);
+        gapDimension(leftEdge, rightEdge, gapY, `Avstand ${formatMeter(rorAvstander[index])}`, index);
+    });
+
+    dimension(X(-toppbredde / 2), Y(0) - 35, X(toppbredde / 2), Y(0) - 35, `Toppbredde ${formatMeter(toppbredde)}`);
+    dimension(X(-bunnbredde / 2), Y(dybde) + 22, X(bunnbredde / 2), Y(dybde) + 22, `Bunnbredde ${formatMeter(bunnbredde)}`, 0, 16);
+
+    const highestPipeTopY = overdekning + dekningOverRor;
+    const coverDimX = X(-breddeVedToppFundament / 2) - 35;
+    dimension(coverDimX, Y(overdekning), coverDimX, Y(highestPipeTopY), "15 cm", -35, 0);
+
+    const clearanceY = Y(dybde - fundament);
+    dimension(X(-breddeVedToppFundament / 2), clearanceY, X(-rorPakkeBredde / 2), clearanceY, "10 cm", 0, -14);
+    dimension(X(rorPakkeBredde / 2), clearanceY, X(breddeVedToppFundament / 2), clearanceY, "10 cm", 0, -14);
+
+    const dimX = X(toppbredde / 2) + 65;
+    dimension(dimX, Y(0), dimX, Y(dybde), `Dybde ${formatMeter(dybde)}`, 58, 0);
+    dimension(dimX + 55, Y(0), dimX + 55, Y(overdekning), `Overdekning ${formatMeter(overdekning)}`, 82, 0);
+    dimension(dimX + 55, Y(dybde - fundament), dimX + 55, Y(dybde), `Fundament ${formatMeter(fundament)}`, 74, 0);
+}
+
+document.querySelectorAll("input").forEach(input => input.addEventListener("input", tegn));
+tegn();
+</script>
+</body>
+</html>
