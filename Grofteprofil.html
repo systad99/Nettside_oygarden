@@ -2,345 +2,301 @@
 <html lang="no">
 <head>
 <meta charset="UTF-8">
-<title>Grøftesnitt PRO</title>
+<title>Grøftesnitt Generator</title>
 <style>
-body { font-family: Arial, sans-serif; display: flex; margin: 0; }
-.panel {
-    width: 280px;
-    padding: 20px;
-    border-right: 1px solid #ccc;
-    overflow-y: auto;
-    max-height: 100vh;
-}
-.panel h3 { margin-top: 0; }
-canvas { flex: 1; border: 1px solid #222; margin: 10px; }
-input { width: 100%; margin-bottom: 8px; padding: 4px; box-sizing: border-box; }
-label { display: block; font-size: 12px; margin-top: 10px; font-weight: bold; }
-button { width: 100%; padding: 10px; margin-top: 20px; background: #4CAF50; color: white; border: none; cursor: pointer; }
-button:hover { background: #45a049; }
+    * { box-sizing: border-box; }
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background: #f6f7f4;
+        color: #20231f;
+    }
+    main {
+        display: grid;
+        grid-template-columns: 300px minmax(0, 1fr);
+        min-height: 100vh;
+    }
+    .panel {
+        background: #ffffff;
+        border-right: 1px solid #d8ddd2;
+        padding: 20px;
+    }
+    h1 {
+        font-size: 22px;
+        margin: 0 0 18px;
+    }
+    label {
+        display: block;
+        font-size: 13px;
+        font-weight: bold;
+        margin-top: 12px;
+    }
+    input {
+        width: 100%;
+        margin-top: 5px;
+        padding: 8px;
+        border: 1px solid #bfc8b8;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+    button {
+        width: 100%;
+        margin-top: 18px;
+        padding: 10px 12px;
+        border: 0;
+        border-radius: 4px;
+        background: #2f6f4e;
+        color: #fff;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    button:hover { background: #265a40; }
+    .summary {
+        margin-top: 18px;
+        padding: 12px;
+        background: #eef4ea;
+        border: 1px solid #d7e4d0;
+        border-radius: 4px;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+    .drawing {
+        padding: 20px;
+        overflow: auto;
+    }
+    canvas {
+        width: 100%;
+        max-width: 1100px;
+        height: auto;
+        background: #fffefa;
+        border: 1px solid #333;
+    }
+    @media (max-width: 760px) {
+        main { grid-template-columns: 1fr; }
+        .panel { border-right: 0; border-bottom: 1px solid #d8ddd2; }
+    }
 </style>
 </head>
 <body>
+<main>
+    <section class="panel">
+        <h1>Grøftesnitt Generator</h1>
 
-<div class="panel">
-<h3>Parametere (Elvia-standard)</h3>
+        <label for="overdekning">Overdekning (m)</label>
+        <input id="overdekning" type="number" value="0.6" step="0.1" min="0">
 
-<div style="background: #E3F2FD; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 11px; color: #1565C0;">
-  <strong>Elvia-standarder:</strong>
-  <br>• Overdekning: min 40 cm (100 cm i dyrket mark)
-  <br>• Ledningssone: 15 cm sand over/under rør
-  <br>• Fundament: min 10 cm kabelsand (0-4 mm)
-  <br>• Grøftedybde: min 60 cm (120 cm i dyrket mark)
-</div>
+        <label for="ror">Rørdiametre (m, kommaseparert)</label>
+        <input id="ror" type="text" value="0.11,0.11,0.11">
 
-<label>Overdekning (mm) - min 400 mm</label>
-<input id="overdekning" value="400" type="number" min="400">
+        <label for="avstand">Avstand mellom rør (m)</label>
+        <input id="avstand" type="number" value="0.05" step="0.01" min="0">
 
-<label>Fundament dybde (mm) - kabelsand min 100 mm</label>
-<input id="fundament" value="100" type="number" min="100">
+        <label for="fundament">Fundament (m)</label>
+        <input id="fundament" type="number" value="0.1" step="0.01" min="0">
 
-<label>Skråningsvinkel (grader)</label>
-<input id="vinkel" value="45" type="number">
+        <label for="vinkel">Skråningsvinkel (grader)</label>
+        <input id="vinkel" type="number" value="45" min="0" max="80">
 
-<label>Kabelbånd over ledningssone</label>
-<input id="kabelbmd" type="checkbox" checked>
+        <button onclick="tegn()">Tegn grøft</button>
 
-<h4 style="margin-top: 20px; border-top: 1px solid #ccc; padding-top: 10px;">Rør</h4>
-<button onclick="leggTilRor('Stikkledning', 110)" style="background: #FF9800; margin-bottom: 8px; width: 100%;">+ Stikkledning (Ø110)</button>
-<button onclick="leggTilRor('LS-stamnett', 110)" style="background: #FF9800; margin-bottom: 8px; width: 100%;">+ LS-stamnett (Ø110)</button>
-<button onclick="leggTilRor('HS-kabler', 160)" style="background: #FF9800; margin-bottom: 15px; width: 100%;">+ HS-kabler (Ø160)</button>
+        <div class="summary" id="summary"></div>
+    </section>
 
-<div id="rorListe"></div>
-<button onclick="leggTilRor('Rør', 110)" style="background: #2196F3; margin-bottom: 15px;">+ Egendefinert rør</button>
-
-<h4>Jording</h4>
-<label>Navn på jording</label>
-<input id="jordingNavn" value="" type="text" placeholder="f.eks. Jord 25">
-
-<label>Diameter (mm)</label>
-<input id="jordingDiameter" value="0" type="number">
-
-<button onclick="tegn()">Tegn grøft</button>
-</div>
-
-<canvas id="c" width="700" height="450"></canvas>
+    <section class="drawing">
+        <canvas id="canvas" width="1100" height="700"></canvas>
+    </section>
+</main>
 
 <script>
-
-// Global liste over rør
-let ror = [];
-let rorIdCounter = 0;
-
-function leggTilRor(navn = "Rør", diameter = 110) {
-    const id = rorIdCounter++;
-    
-    // Beregn automatisk x-offset basert på eksisterende rør
-    let xOffset = 0;
-    if(ror.length > 0) {
-        // Finn det mest høyre røret og legg til nytt rør til høyre for det
-        let maxX = -Infinity;
-        ror.forEach(r => {
-            const rightEdge = r.xOffset + r.diameter/2;
-            if(rightEdge > maxX) maxX = rightEdge;
-        });
-        
-        // Legg til minimum 50mm mellom rør + diameter/2 avstand
-        xOffset = maxX + 50 + diameter/2;
-    }
-    
-    ror.push({ id: id, navn: navn, diameter: diameter, xOffset: xOffset });
-    renderRorPanel();
-    tegn();
+function parseRor(value) {
+    return value
+        .split(",")
+        .map(item => parseFloat(item.trim()))
+        .filter(diameter => Number.isFinite(diameter) && diameter > 0);
 }
 
-function fjernRor(id) {
-    ror = ror.filter(r => r.id !== id);
-    renderRorPanel();
-    tegn();
+function formatMeter(value) {
+    return `${value.toFixed(2)} m`;
 }
 
-function renderRorPanel() {
-    const container = document.getElementById("rorListe");
-    container.innerHTML = "";
-    
-    ror.forEach((r, index) => {
-        const div = document.createElement("div");
-        div.style.cssText = "background: #f5f5f5; padding: 10px; margin-bottom: 10px; border-radius: 4px; border-left: 3px solid #2196F3;";
-        
-        div.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <label style="margin: 0; font-weight: bold; color: #666;">Rør ${index + 1}</label>
-                <button onclick="fjernRor(${r.id})" style="background: #f44336; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 12px;">Fjern</button>
-            </div>
-            <label style="margin-top: 5px;">Navn</label>
-            <input type="text" id="ror_${r.id}_navn" value="${r.navn}" style="width: 100%; margin-bottom: 6px; padding: 4px; box-sizing: border-box;" onchange="oppdaterRor(${r.id}, 'navn', this.value)">
-            
-            <label>Diameter (mm)</label>
-            <input type="number" id="ror_${r.id}_dia" value="${r.diameter}" style="width: 100%; margin-bottom: 6px; padding: 4px; box-sizing: border-box;" onchange="oppdaterRor(${r.id}, 'diameter', parseFloat(this.value))">
-            
-            <label>X-offset fra senter (mm)</label>
-            <input type="number" id="ror_${r.id}_x" value="${r.xOffset}" style="width: 100%; padding: 4px; box-sizing: border-box;" onchange="oppdaterRor(${r.id}, 'xOffset', parseFloat(this.value))">
-        `;
-        container.appendChild(div);
-    });
-}
+function tegn() {
+    const overdekning = parseFloat(document.getElementById("overdekning").value) || 0;
+    const ror = parseRor(document.getElementById("ror").value);
+    const avstand = parseFloat(document.getElementById("avstand").value) || 0;
+    const fundament = parseFloat(document.getElementById("fundament").value) || 0;
+    const vinkel = parseFloat(document.getElementById("vinkel").value) || 0;
 
-function oppdaterRor(id, egenskap, verdi) {
-    const ror_idx = ror.findIndex(r => r.id === id);
-    if(ror_idx !== -1) {
-        ror[ror_idx][egenskap] = verdi;
-        tegn();
-    }
-}
-
-// Hjelpefunksjon for skravur
-function hatchPattern(ctx, pathFn, type) {
-    ctx.save();
-    ctx.beginPath();
-    pathFn();
-    ctx.clip();
-    ctx.strokeStyle = "#999";
-    ctx.lineWidth = 1;
-
-    if(type === "diagonal") {
-        for(let i=-500; i<1000; i+=12){
-            ctx.beginPath();
-            ctx.moveTo(i, 0);
-            ctx.lineTo(i+800, 800);
-            ctx.stroke();
-        }
+    if (ror.length === 0) {
+        document.getElementById("summary").textContent = "Legg inn minst én gyldig rørdiameter.";
+        return;
     }
 
-    if(type === "cross") {
-        for(let i=-500; i<1000; i+=12){
-            ctx.beginPath();
-            ctx.moveTo(i, 0);
-            ctx.lineTo(i+800, 800);
-            ctx.stroke();
-        }
-        for(let i=-500; i<1000; i+=12){
-            ctx.beginPath();
-            ctx.moveTo(i, 800);
-            ctx.lineTo(i+800, 0);
-            ctx.stroke();
-        }
-    }
+    const sideklaring = 0.10;
+    const dekningOverRor = 0.15;
+    const maksDiameter = Math.max(...ror);
+    const dybde = overdekning + dekningOverRor + maksDiameter + fundament;
+    const rorPakkeBredde = ror.reduce((sum, diameter) => sum + diameter, 0) + avstand * (ror.length - 1);
+    const theta = vinkel * Math.PI / 180;
+    const breddeVedToppFundament = rorPakkeBredde + sideklaring * 2;
+    const beregnetBunnbredde = breddeVedToppFundament - 2 * fundament * Math.tan(theta);
+    const bunnbredde = Math.max(0.02, beregnetBunnbredde);
+    const toppbredde = breddeVedToppFundament + 2 * (dybde - fundament) * Math.tan(theta);
 
-    if(type === "horizontal") {
-        for(let y=0; y<800; y+=8){
-            ctx.beginPath();
-            ctx.moveTo(0, y);
-            ctx.lineTo(800, y);
-            ctx.stroke();
-        }
-    }
+    document.getElementById("summary").innerHTML = `
+        Dybde: <strong>${formatMeter(dybde)}</strong><br>
+        Bunnbredde: <strong>${formatMeter(bunnbredde)}</strong><br>
+        Dekning over høyeste rør: <strong>${formatMeter(dekningOverRor)}</strong><br>
+        Bredde ved topp fundament: <strong>${formatMeter(breddeVedToppFundament)}</strong><br>
+        Sideklaring: <strong>${formatMeter(sideklaring)}</strong><br>
+        Toppbredde: <strong>${formatMeter(toppbredde)}</strong>
+    `;
 
-    ctx.restore();
-}
-
-// Konverteringsfunksjoner fra mm til canvas
-function X(mm) {
-    const centerX = 350;
-    const scale = 0.6; // mm til pixels
-    return centerX + mm * scale;
-}
-
-function Y(mm) {
-    const startY = 40;
-    const scale = 0.6;
-    return startY + mm * scale;
-}
-
-function tegn(){
-    const canvas = document.getElementById("c");
+    const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Hent input-verdier
-    const overdekning = parseFloat(document.getElementById("overdekning").value);
-    const fundament = parseFloat(document.getElementById("fundament").value);
-    const vinkel = parseFloat(document.getElementById("vinkel").value);
-    const visKabelband = document.getElementById("kabelbmd").checked;
-    const jordingDiameter = parseFloat(document.getElementById("jordingDiameter").value);
-    const jordingNavn = document.getElementById("jordingNavn").value;
-    
-    // Beregn største rør diameter
-    let storrsteRor = 0;
-    ror.forEach(r => {
-        if(r.diameter > storrsteRor) {
-            storrsteRor = r.diameter;
-        }
-    });
-    
-    // Beregn ledningssone automatisk: største rør + 100 mm (50 mm hver side)
-    const ledning = storrsteRor + 100;
-    
-    // Beregn bunn-bredde automatisk basert på rørstørrelse
-    // Minimum plass for det største røret + 100 mm på hver side
-    const bunn = storrsteRor + 200;
-    
-    // Beregner dimensjoner
-    const totalDybde = overdekning + ledning + fundament;
-    const vinkelRad = (vinkel * Math.PI) / 180;
-    const topBredde = bunn + 2 * totalDybde * Math.tan(vinkelRad);
-    
-    // Tegner grøft
-    ctx.strokeStyle = "#000";
-    ctx.lineWidth = 2.5;
-    ctx.beginPath();
-    ctx.moveTo(X(-topBredde/2), Y(0));
-    ctx.lineTo(X(topBredde/2), Y(0));
-    ctx.lineTo(X(bunn/2), Y(totalDybde));
-    ctx.lineTo(X(-bunn/2), Y(totalDybde));
-    ctx.closePath();
-    ctx.stroke();
-    
-    // Tegner horisontale linjer for lagene
-    ctx.strokeStyle = "#000";
-    ctx.lineWidth = 1;
-    ctx.setLineDash([5, 5]);
-    
-    // Linje mellom gjenfylling og ledningssone
-    ctx.beginPath();
-    ctx.moveTo(X(-topBredde/2 + overdekning * Math.tan(vinkelRad)), Y(overdekning));
-    ctx.lineTo(X(topBredde/2 - overdekning * Math.tan(vinkelRad)), Y(overdekning));
-    ctx.stroke();
-    
-    // Linje mellom ledningssone og fundament
-    ctx.beginPath();
-    ctx.moveTo(X(-bunn/2), Y(overdekning + ledning));
-    ctx.lineTo(X(bunn/2), Y(overdekning + ledning));
-    ctx.stroke();
-    
-    ctx.setLineDash([]);
-    
-    // KABELBÅND - strek over ledningssone
-    if(visKabelband) {
-        ctx.strokeStyle = "#FF6600";
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.moveTo(X(-bunn/2 + 20), Y(overdekning + ledning - 10));
-        ctx.lineTo(X(bunn/2 - 20), Y(overdekning + ledning - 10));
-        ctx.stroke();
+
+    const margin = { left: 140, right: 190, top: 90, bottom: 130 };
+    const availableWidth = canvas.width - margin.left - margin.right;
+    const availableHeight = canvas.height - margin.top - margin.bottom;
+    const scale = Math.min(availableWidth / Math.max(toppbredde, 0.1), availableHeight / Math.max(dybde, 0.1));
+    const centerX = canvas.width / 2 - 30;
+    const topY = margin.top;
+
+    function X(x) { return centerX + x * scale; }
+    function Y(y) { return topY + y * scale; }
+
+    function label(text, x, y, align = "center", weight = "normal") {
+        ctx.fillStyle = "#111";
+        ctx.font = `${weight} 14px Arial`;
+        ctx.textAlign = align;
+        ctx.textBaseline = "middle";
+        ctx.fillText(text, x, y);
     }
-    
-    // JORDING - tegn jording i bunn hvis diameter > 0
-    if(jordingDiameter > 0) {
-        const jordingRadius = jordingDiameter / 2;
-        ctx.beginPath();
-        ctx.arc(X(0), Y(overdekning + ledning + fundament), jordingRadius * 0.6, 0, Math.PI * 2);
-        ctx.fillStyle = "#C0C0C0"; // Grå farge for jording
-        ctx.fill();
-        ctx.strokeStyle = "#000";
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-        
-        // Navn på jording
-        if(jordingNavn) {
-            ctx.fillStyle = "#000";
-            ctx.font = "9px Arial";
-            ctx.textAlign = "center";
-            ctx.fillText(jordingNavn, X(0), Y(overdekning + ledning + fundament) + 3);
+
+    function labelIfInsideTrench(text, xMeter, yMeter, weight = "normal") {
+        ctx.font = `${weight} 14px Arial`;
+        const textWidthMeter = ctx.measureText(text).width / scale;
+        const halfAvailableWidth = trenchWidthAtDepth(yMeter) / 2 - 0.04;
+
+        if (Math.abs(xMeter) + textWidthMeter / 2 <= halfAvailableWidth) {
+            label(text, X(xMeter), Y(yMeter), "center", weight);
         }
     }
-    
-    // RØR - tegner rør fra listen (ligger på toppen av fundament/kabelsand)
-    ror.forEach(r => {
-        if(r.diameter > 0) {
-            const radius = r.diameter / 2;
+
+    function dimension(x1, y1, x2, y2, text, textOffsetX = 0, textOffsetY = -12) {
+        ctx.save();
+        ctx.strokeStyle = "#111";
+        ctx.fillStyle = "#111";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+
+        const angle = Math.atan2(y2 - y1, x2 - x1);
+        [0, 1].forEach(end => {
+            const x = end ? x2 : x1;
+            const y = end ? y2 : y1;
+            const dir = end ? angle + Math.PI : angle;
             ctx.beginPath();
-            ctx.arc(X(r.xOffset), Y(overdekning + ledning), radius * 0.6, 0, Math.PI * 2);
-            ctx.fillStyle = "orange";
+            ctx.moveTo(x, y);
+            ctx.lineTo(x + Math.cos(dir + 0.45) * 10, y + Math.sin(dir + 0.45) * 10);
+            ctx.lineTo(x + Math.cos(dir - 0.45) * 10, y + Math.sin(dir - 0.45) * 10);
+            ctx.closePath();
             ctx.fill();
-            ctx.strokeStyle = "#000";
-            ctx.lineWidth = 1.5;
-            ctx.stroke();
-            
-            // Navn på rør
-            if(r.navn) {
-                ctx.fillStyle = "#000";
-                ctx.font = "9px Arial";
-                ctx.textAlign = "center";
-                ctx.fillText(r.navn, X(r.xOffset), Y(overdekning + ledning) + 3);
-            }
+        });
+
+        label(text, (x1 + x2) / 2 + textOffsetX, (y1 + y2) / 2 + textOffsetY);
+        ctx.restore();
+    }
+
+    function horizontalBoundary(y, width) {
+        ctx.setLineDash([8, 5]);
+        ctx.strokeStyle = "#777";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(X(-width / 2), Y(y));
+        ctx.lineTo(X(width / 2), Y(y));
+        ctx.stroke();
+        ctx.setLineDash([]);
+    }
+
+    function trenchWidthAtDepth(y) {
+        if (y === dybde - fundament) {
+            return breddeVedToppFundament;
         }
-    });
-    
-    // DIMENSJONSLINJER OG HØYDEANGIVELSER
-    ctx.strokeStyle = "#000";
-    ctx.fillStyle = "#000";
-    ctx.font = "bold 11px Arial";
-    ctx.textAlign = "center";
-    
-    // Bunn-bredde
-    ctx.lineWidth = 1;
+
+        if (y < dybde - fundament) {
+            return breddeVedToppFundament + 2 * (dybde - fundament - y) * Math.tan(theta);
+        }
+
+        const fundamentRatio = fundament > 0 ? (dybde - y) / fundament : 0;
+        return bunnbredde + (breddeVedToppFundament - bunnbredde) * fundamentRatio;
+    }
+
+    ctx.fillStyle = "#f2ede1";
+    ctx.strokeStyle = "#222";
+    ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(X(-bunn/2), Y(totalDybde + 35));
-    ctx.lineTo(X(bunn/2), Y(totalDybde + 35));
+    ctx.moveTo(X(-toppbredde / 2), Y(0));
+    ctx.lineTo(X(toppbredde / 2), Y(0));
+    ctx.lineTo(X(breddeVedToppFundament / 2), Y(dybde - fundament));
+    ctx.lineTo(X(bunnbredde / 2), Y(dybde));
+    ctx.lineTo(X(-bunnbredde / 2), Y(dybde));
+    ctx.lineTo(X(-breddeVedToppFundament / 2), Y(dybde - fundament));
+    ctx.closePath();
+    ctx.fill();
     ctx.stroke();
-    ctx.fillText(Math.round(bunn) + " mm", X(0), Y(totalDybde + 53));
-    
-    // Høydeangivelser på høyre side
-    ctx.textAlign = "left";
-    ctx.font = "11px Arial";
-    const textX = X(bunn/2 + 50);
-    
-    // Overdekning
-    ctx.fillText(Math.round(overdekning) + " mm", textX, Y(overdekning/2) + 4);
-    
-    // Ledningssone
-    ctx.fillText(Math.round(ledning) + " mm", textX, Y(overdekning + ledning/2) + 4);
-    
-    // Fundament
-    ctx.fillText(Math.round(fundament) + " mm", textX, Y(overdekning + ledning + fundament/2) + 4);
+
+    const widthAtOverdekning = toppbredde - 2 * overdekning * Math.tan(theta);
+    horizontalBoundary(overdekning, widthAtOverdekning);
+    horizontalBoundary(dybde - fundament, trenchWidthAtDepth(dybde - fundament));
+
+    labelIfInsideTrench("Gjenfylling", 0, overdekning / 2, "bold");
+    labelIfInsideTrench("Rørsone", 0, overdekning + (dekningOverRor + maksDiameter) / 2, "bold");
+
+    let currentX = -rorPakkeBredde / 2;
+    ror.forEach((diameter, index) => {
+        const radius = diameter / 2;
+        const cx = currentX + radius;
+        const cy = overdekning + dekningOverRor + maksDiameter - radius;
+
+        ctx.beginPath();
+        ctx.arc(X(cx), Y(cy), radius * scale, 0, 2 * Math.PI);
+        ctx.fillStyle = "#f2a23a";
+        ctx.fill();
+        ctx.strokeStyle = "#111";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        const pipeLabel = diameter * scale > 42 ? `Rør ${index + 1}` : `${index + 1}`;
+        labelIfInsideTrench(pipeLabel, cx, cy, "bold");
+
+        const diameterLabelY = cy + radius + 0.04;
+        labelIfInsideTrench(`Ø ${formatMeter(diameter)}`, cx, diameterLabelY);
+
+        currentX += diameter + avstand;
+    });
+
+    dimension(X(-toppbredde / 2), Y(0) - 35, X(toppbredde / 2), Y(0) - 35, `Toppbredde ${formatMeter(toppbredde)}`);
+    dimension(X(-bunnbredde / 2), Y(dybde) + 45, X(bunnbredde / 2), Y(dybde) + 45, `Bunnbredde ${formatMeter(bunnbredde)}`, 0, 18);
+
+    const highestPipeTopY = overdekning + dekningOverRor;
+    const coverDimX = X(-breddeVedToppFundament / 2) - 35;
+    dimension(coverDimX, Y(overdekning), coverDimX, Y(highestPipeTopY), "15 cm", -35, 0);
+
+    const clearanceY = Y(dybde - fundament);
+    dimension(X(-breddeVedToppFundament / 2), clearanceY, X(-rorPakkeBredde / 2), clearanceY, "10 cm", 0, -14);
+    dimension(X(rorPakkeBredde / 2), clearanceY, X(breddeVedToppFundament / 2), clearanceY, "10 cm", 0, -14);
+
+    const dimX = X(toppbredde / 2) + 65;
+    dimension(dimX, Y(0), dimX, Y(dybde), `Dybde ${formatMeter(dybde)}`, 58, 0);
+    dimension(dimX + 55, Y(0), dimX + 55, Y(overdekning), `Overdekning ${formatMeter(overdekning)}`, 82, 0);
+    dimension(dimX + 55, Y(dybde - fundament), dimX + 55, Y(dybde), `Fundament ${formatMeter(fundament)}`, 74, 0);
 }
 
-// Tegn ved start
+document.querySelectorAll("input").forEach(input => input.addEventListener("input", tegn));
 tegn();
-
 </script>
-
-
-
 </body>
 </html>
