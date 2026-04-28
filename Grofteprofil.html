@@ -43,12 +43,77 @@ button:hover { background: #45a049; }
 <label>Skråningsvinkel (grader)</label>
 <input id="vinkel" value="45" type="number">
 
+<label>Kabelbånd over ledningssone</label>
+<input id="kabelbmd" type="checkbox" checked>
+
+<h4 style="margin-top: 20px; border-top: 1px solid #ccc; padding-top: 10px;">Rør</h4>
+<div id="rorListe"></div>
+<button onclick="leggTilRor()" style="background: #2196F3; margin-bottom: 15px;">+ Legg til rør</button>
+
+<h4>Jording</h4>
+<label>Navn på jording</label>
+<input id="jordingNavn" value="" type="text" placeholder="f.eks. Jord 25">
+
+<label>Diameter (mm)</label>
+<input id="jordingDiameter" value="0" type="number">
+
 <button onclick="tegn()">Tegn grøft</button>
 </div>
 
 <canvas id="c" width="900" height="550"></canvas>
 
 <script>
+
+// Global liste over rør
+let ror = [];
+let rorIdCounter = 0;
+
+function leggTilRor() {
+    const id = rorIdCounter++;
+    ror.push({ id: id, navn: `Rør ${ror.length + 1}`, diameter: 110, xOffset: 0 });
+    renderRorPanel();
+    tegn();
+}
+
+function fjernRor(id) {
+    ror = ror.filter(r => r.id !== id);
+    renderRorPanel();
+    tegn();
+}
+
+function renderRorPanel() {
+    const container = document.getElementById("rorListe");
+    container.innerHTML = "";
+    
+    ror.forEach((r, index) => {
+        const div = document.createElement("div");
+        div.style.cssText = "background: #f5f5f5; padding: 10px; margin-bottom: 10px; border-radius: 4px; border-left: 3px solid #2196F3;";
+        
+        div.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <label style="margin: 0; font-weight: bold; color: #666;">Rør ${index + 1}</label>
+                <button onclick="fjernRor(${r.id})" style="background: #f44336; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 12px;">Fjern</button>
+            </div>
+            <label style="margin-top: 5px;">Navn</label>
+            <input type="text" id="ror_${r.id}_navn" value="${r.navn}" style="width: 100%; margin-bottom: 6px; padding: 4px; box-sizing: border-box;" onchange="oppdaterRor(${r.id}, 'navn', this.value)">
+            
+            <label>Diameter (mm)</label>
+            <input type="number" id="ror_${r.id}_dia" value="${r.diameter}" style="width: 100%; margin-bottom: 6px; padding: 4px; box-sizing: border-box;" onchange="oppdaterRor(${r.id}, 'diameter', parseFloat(this.value))">
+            
+            <label>X-offset fra senter (mm)</label>
+            <input type="number" id="ror_${r.id}_x" value="${r.xOffset}" style="width: 100%; padding: 4px; box-sizing: border-box;" onchange="oppdaterRor(${r.id}, 'xOffset', parseFloat(this.value))">
+        `;
+        container.appendChild(div);
+    });
+}
+
+function oppdaterRor(id, egenskap, verdi) {
+    const ror_idx = ror.findIndex(r => r.id === id);
+    if(ror_idx !== -1) {
+        ror[ror_idx][egenskap] = verdi;
+        tegn();
+    }
+}
 
 // Hjelpefunksjon for skravur
 function hatchPattern(ctx, pathFn, type) {
@@ -117,141 +182,131 @@ function tegn(){
     const overdekning = parseFloat(document.getElementById("overdekning").value);
     const ledning = parseFloat(document.getElementById("ledning").value);
     const fundament = parseFloat(document.getElementById("fundament").value);
-    const ror = parseFloat(document.getElementById("ror").value);
     const bunn = parseFloat(document.getElementById("bunn").value);
     const vinkel = parseFloat(document.getElementById("vinkel").value);
+    const visKabelband = document.getElementById("kabelbmd").checked;
+    const jordingDiameter = parseFloat(document.getElementById("jordingDiameter").value);
+    const jordingNavn = document.getElementById("jordingNavn").value;
     
     // Beregner dimensjoner
     const totalDybde = overdekning + ledning + fundament;
-    const radius = ror / 2;
     const vinkelRad = (vinkel * Math.PI) / 180;
     const topBredde = bunn + 2 * totalDybde * Math.tan(vinkelRad);
     
-    // Overkant
+    // Tegner grøft
     ctx.strokeStyle = "#000";
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 2.5;
     ctx.beginPath();
     ctx.moveTo(X(-topBredde/2), Y(0));
     ctx.lineTo(X(topBredde/2), Y(0));
-    ctx.stroke();
-    
-    // Skråninger og bunn
-    ctx.beginPath();
-    ctx.moveTo(X(-topBredde/2), Y(0));
-    ctx.lineTo(X(-bunn/2), Y(totalDybde));
     ctx.lineTo(X(bunn/2), Y(totalDybde));
-    ctx.lineTo(X(topBredde/2), Y(0));
+    ctx.lineTo(X(-bunn/2), Y(totalDybde));
+    ctx.closePath();
     ctx.stroke();
     
-    // SKRAVUR - Gjenfyllingssone
-    hatchPattern(ctx, () => {
-        ctx.moveTo(X(-topBredde/2), Y(0));
-        ctx.lineTo(X(topBredde/2), Y(0));
-        ctx.lineTo(X(topBredde/2 - overdekning * Math.tan(vinkelRad)), Y(overdekning));
-        ctx.lineTo(X(-topBredde/2 + overdekning * Math.tan(vinkelRad)), Y(overdekning));
-        ctx.closePath();
-    }, "diagonal");
-    
-    // SKRAVUR - Ledningssone
-    hatchPattern(ctx, () => {
-        ctx.moveTo(X(topBredde/2 - overdekning * Math.tan(vinkelRad)), Y(overdekning));
-        ctx.lineTo(X(-topBredde/2 + overdekning * Math.tan(vinkelRad)), Y(overdekning));
-        ctx.lineTo(X(-bunn/2), Y(overdekning + ledning));
-        ctx.lineTo(X(bunn/2), Y(overdekning + ledning));
-        ctx.closePath();
-    }, "cross");
-    
-    // SKRAVUR - Fundament
-    hatchPattern(ctx, () => {
-        ctx.moveTo(X(-bunn/2), Y(totalDybde - fundament));
-        ctx.lineTo(X(bunn/2), Y(totalDybde - fundament));
-        ctx.lineTo(X(bunn/2), Y(totalDybde));
-        ctx.lineTo(X(-bunn/2), Y(totalDybde));
-        ctx.closePath();
-    }, "horizontal");
-    
-    // RØR
-    ctx.beginPath();
-    ctx.arc(X(0), Y(overdekning + ledning + fundament/2), radius * 0.6, 0, Math.PI * 2);
-    ctx.fillStyle = "orange";
-    ctx.fill();
+    // Tegner horisontale linjer for lagene
     ctx.strokeStyle = "#000";
-    ctx.lineWidth = 1.5;
+    ctx.lineWidth = 1;
+    ctx.setLineDash([5, 5]);
+    
+    // Linje mellom gjenfylling og ledningssone
+    ctx.beginPath();
+    ctx.moveTo(X(-topBredde/2 + overdekning * Math.tan(vinkelRad)), Y(overdekning));
+    ctx.lineTo(X(topBredde/2 - overdekning * Math.tan(vinkelRad)), Y(overdekning));
     ctx.stroke();
     
-    // Dimensjonslinjer
+    // Linje mellom ledningssone og fundament
+    ctx.beginPath();
+    ctx.moveTo(X(-bunn/2), Y(overdekning + ledning));
+    ctx.lineTo(X(bunn/2), Y(overdekning + ledning));
+    ctx.stroke();
+    
+    ctx.setLineDash([]);
+    
+    // KABELBÅND - strek over ledningssone
+    if(visKabelband) {
+        ctx.strokeStyle = "#FF6600";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(X(-bunn/2 + 20), Y(overdekning + ledning - 10));
+        ctx.lineTo(X(bunn/2 - 20), Y(overdekning + ledning - 10));
+        ctx.stroke();
+    }
+    
+    // JORDING - tegn jording i bunn hvis diameter > 0
+    if(jordingDiameter > 0) {
+        const jordingRadius = jordingDiameter / 2;
+        ctx.beginPath();
+        ctx.arc(X(0), Y(totalDybde), jordingRadius * 0.6, 0, Math.PI * 2);
+        ctx.fillStyle = "#C0C0C0"; // Grå farge for jording
+        ctx.fill();
+        ctx.strokeStyle = "#000";
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        
+        // Navn på jording
+        if(jordingNavn) {
+            ctx.fillStyle = "#000";
+            ctx.font = "9px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText(jordingNavn, X(0), Y(totalDybde) + 3);
+        }
+    }
+    
+    // RØR - tegner rør fra listen
+    ror.forEach(r => {
+        if(r.diameter > 0) {
+            const radius = r.diameter / 2;
+            ctx.beginPath();
+            ctx.arc(X(r.xOffset), Y(overdekning + ledning + fundament), radius * 0.6, 0, Math.PI * 2);
+            ctx.fillStyle = "orange";
+            ctx.fill();
+            ctx.strokeStyle = "#000";
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            
+            // Navn på rør
+            if(r.navn) {
+                ctx.fillStyle = "#000";
+                ctx.font = "9px Arial";
+                ctx.textAlign = "center";
+                ctx.fillText(r.navn, X(r.xOffset), Y(overdekning + ledning + fundament) + 3);
+            }
+        }
+    });
+    
+    // DIMENSJONSLINJER OG HØYDEANGIVELSER
     ctx.strokeStyle = "#000";
     ctx.fillStyle = "#000";
-    ctx.font = "12px Arial";
+    ctx.font = "bold 11px Arial";
     ctx.textAlign = "center";
     
     // Bunn-bredde
+    ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(X(-bunn/2), Y(totalDybde + 30));
-    ctx.lineTo(X(bunn/2), Y(totalDybde + 30));
+    ctx.moveTo(X(-bunn/2), Y(totalDybde + 35));
+    ctx.lineTo(X(bunn/2), Y(totalDybde + 35));
     ctx.stroke();
-    ctx.fillText(Math.round(bunn) + " mm", X(0), Y(totalDybde + 50));
+    ctx.fillText(Math.round(bunn) + " mm", X(0), Y(totalDybde + 53));
     
-    // Dybdemål
-    ctx.strokeStyle = "#000";
-    ctx.textAlign = "right";
+    // Høydeangivelser på høyre side
+    ctx.textAlign = "left";
     ctx.font = "11px Arial";
+    const textX = X(bunn/2 + 50);
     
     // Overdekning
-    ctx.beginPath();
-    ctx.moveTo(X(-topBredde/2 - 40), Y(0));
-    ctx.lineTo(X(-topBredde/2 - 40), Y(overdekning));
-    ctx.stroke();
-    ctx.fillText(Math.round(overdekning), X(-topBredde/2 - 50), Y(overdekning/2));
+    ctx.fillText(Math.round(overdekning) + " mm", textX, Y(overdekning/2) + 4);
     
     // Ledningssone
-    ctx.beginPath();
-    ctx.moveTo(X(-topBredde/2 - 40), Y(overdekning));
-    ctx.lineTo(X(-topBredde/2 - 40), Y(overdekning + ledning));
-    ctx.stroke();
-    ctx.fillText(Math.round(ledning), X(-topBredde/2 - 50), Y(overdekning + ledning/2));
+    ctx.fillText(Math.round(ledning) + " mm", textX, Y(overdekning + ledning/2) + 4);
     
     // Fundament
-    ctx.beginPath();
-    ctx.moveTo(X(-topBredde/2 - 40), Y(overdekning + ledning));
-    ctx.lineTo(X(-topBredde/2 - 40), Y(totalDybde));
-    ctx.stroke();
-    ctx.fillText(Math.round(fundament), X(-topBredde/2 - 50), Y(overdekning + ledning + fundament/2));
-    
-    // TEKST
-    ctx.fillStyle = "#333";
-    ctx.textAlign = "center";
-    ctx.font = "bold 12px Arial";
-    
-    // Tekstlabels på siden
-    ctx.save();
-    ctx.translate(X(-topBredde/2 - 100), Y(overdekning/2));
-    ctx.rotate(-Math.PI/2);
-    ctx.textAlign = "center";
-    ctx.fillText("GJENFYLLINGSSONE", 0, 0);
-    ctx.restore();
-    
-    ctx.save();
-    ctx.translate(X(-topBredde/2 - 100), Y(overdekning + ledning/2));
-    ctx.rotate(-Math.PI/2);
-    ctx.textAlign = "center";
-    ctx.fillText("LEDNINGSSONE", 0, 0);
-    ctx.restore();
-    
-    ctx.save();
-    ctx.translate(X(-topBredde/2 - 100), Y(overdekning + ledning + fundament/2));
-    ctx.rotate(-Math.PI/2);
-    ctx.textAlign = "center";
-    ctx.fillText("NEDRE FUNDAMENT", 0, 0);
-    ctx.restore();
-    
-    ctx.textAlign = "center";
-    ctx.font = "11px Arial";
-    ctx.fillText("Strøm Styreskap", X(0), Y(overdekning + ledning + fundament/2) + 30);
+    ctx.fillText(Math.round(fundament) + " mm", textX, Y(overdekning + ledning + fundament/2) + 4);
 }
 
 // Tegn ved start
 tegn();
+
 </script>
 
 
