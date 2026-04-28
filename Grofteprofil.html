@@ -46,7 +46,7 @@ button:hover { background: #45a049; }
 <button onclick="tegn()">Tegn grøft</button>
 </div>
 
-<canvas id="c" width="1000" height="700"></canvas>
+<canvas id="c" width="900" height="550"></canvas>
 
 <script>
 
@@ -97,14 +97,14 @@ function hatchPattern(ctx, pathFn, type) {
 
 // Konverteringsfunksjoner fra mm til canvas
 function X(mm) {
-    const centerX = 450;
-    const scale = 1.2; // mm til pixels
+    const centerX = 350;
+    const scale = 0.6; // mm til pixels
     return centerX + mm * scale;
 }
 
 function Y(mm) {
-    const startY = 80;
-    const scale = 1.2;
+    const startY = 40;
+    const scale = 0.6;
     return startY + mm * scale;
 }
 
@@ -172,11 +172,11 @@ function tegn(){
     
     // RØR
     ctx.beginPath();
-    ctx.arc(X(0), Y(overdekning + ledning + fundament/2), radius * 1.2, 0, Math.PI * 2);
+    ctx.arc(X(0), Y(overdekning + ledning + fundament/2), radius * 0.6, 0, Math.PI * 2);
     ctx.fillStyle = "orange";
     ctx.fill();
     ctx.strokeStyle = "#000";
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 1.5;
     ctx.stroke();
     
     // Dimensjonslinjer
