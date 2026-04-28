@@ -285,17 +285,33 @@ function tegn() {
     const lowestBottom = Math.max(...pipes.map(pipe => pipe.bottom));
     const highestTop = Math.min(...pipes.map(pipe => pipe.top));
 
+    const toppLedningssone = overdekning;
+
     pipes.forEach(pipe => {
-        pipe.y = pipe.cy - highestTop + overdekning;
+        pipe.y = pipe.cy - highestTop + toppLedningssone + beskyttelseslag;
     });
 
-    const toppLedningssone = Math.max(0, overdekning - beskyttelseslag);
-    const bunnLedningssone = lowestBottom - highestTop + overdekning + fundament;
+    const bunnLedningssone = lowestBottom - highestTop + toppLedningssone + beskyttelseslag + fundament;
     const dybde = bunnLedningssone;
     const breddeVedRor = rorPakkeBredde + sideAvstand * 2;
     const theta = vinkel * Math.PI / 180;
     const bunnbredde = Math.max(0.10, breddeVedRor - 2 * fundament * Math.tan(theta));
     const toppbredde = breddeVedRor + 2 * (dybde - fundament) * Math.tan(theta);
+    function trenchWidthAt(y) {
+        if (y <= dybde - fundament) {
+            return breddeVedRor + 2 * (dybde - fundament - y) * Math.tan(theta);
+        }
+
+        const ratio = fundament > 0 ? (dybde - y) / fundament : 0;
+        return bunnbredde + (breddeVedRor - bunnbredde) * ratio;
+    }
+    const widthAtToppLedningssone = trenchWidthAt(toppLedningssone);
+    const overdekningHoyde = toppLedningssone;
+    const ledningssoneHoyde = (dybde - fundament) - toppLedningssone;
+    const overdekningAreal = ((toppbredde + widthAtToppLedningssone) / 2) * toppLedningssone;
+    const ledningssoneBruttoAreal = ((widthAtToppLedningssone + breddeVedRor) / 2) * ledningssoneHoyde;
+    const rorAreal = pipes.reduce((sum, pipe) => sum + Math.PI * pipe.radius * pipe.radius, 0);
+    const ledningssoneNettoAreal = Math.max(0, ledningssoneBruttoAreal - rorAreal);
 
     document.getElementById("summary").innerHTML = `
         Dybde: <strong>${formatMeter(dybde)}</strong><br>
@@ -303,6 +319,12 @@ function tegn() {
         A sideavstand: <strong>${formatMeter(sideAvstand)}</strong><br>
         B/C røravstand: <strong>${formatMeter(minRorAvstand)}</strong><br>
         E fundament (${grunnforhold === "fjell" ? "fjell/betong" : "løsmasser"}): <strong>${formatMeter(fundament)}</strong><br>
+        Areal overdekning/gjenfylling: <strong>${overdekningAreal.toFixed(2)} m²</strong><br>
+        Ledningssone brutto: <strong>${ledningssoneBruttoAreal.toFixed(2)} m²</strong><br>
+        Rørareal: <strong>${rorAreal.toFixed(2)} m²</strong><br>
+        Ledningssone netto: <strong>${ledningssoneNettoAreal.toFixed(2)} m²</strong><br>
+        Beregning overdekning: <strong>(${formatMeter(toppbredde)} + ${formatMeter(widthAtToppLedningssone)}) / 2 × ${formatMeter(overdekningHoyde)}</strong><br>
+        Beregning ledningssone brutto: <strong>(${formatMeter(widthAtToppLedningssone)} + ${formatMeter(breddeVedRor)}) / 2 × ${formatMeter(ledningssoneHoyde)}</strong><br>
         Beregnede røravstander: <strong>${rorAvstander.length ? rorAvstander.map(formatMeter).join(", ") : formatMeter(0)}</strong><br>
         Ekstra vertikal avstand: <strong>${formatMeter(vertikalAvstand)}</strong><br>
         Spillvann ligger lavest: <strong>ja</strong>
@@ -323,12 +345,7 @@ function tegn() {
     function Y(y) { return topY + y * scale; }
 
     function trenchWidthAtDepth(y) {
-        if (y <= dybde - fundament) {
-            return breddeVedRor + 2 * (dybde - fundament - y) * Math.tan(theta);
-        }
-
-        const ratio = fundament > 0 ? (dybde - y) / fundament : 0;
-        return bunnbredde + (breddeVedRor - bunnbredde) * ratio;
+        return trenchWidthAt(y);
     }
 
     function label(text, x, y, align = "center", weight = "normal") {
@@ -425,7 +442,28 @@ function tegn() {
         ctx.lineTo(midX, labelY - 10);
         ctx.stroke();
         ctx.setLineDash([]);
-        labelBox(`Avstand ${formatMeter(gap)}`, midX, labelY);
+        labelBox(formatMeter(gap), midX, labelY);
+        ctx.restore();
+    }
+
+    function sideDistanceDimension(x1Meter, x2Meter, yMeter, text, side) {
+        const arrowY = Y(yMeter);
+        const midX = (X(x1Meter) + X(x2Meter)) / 2;
+        const labelY = Y(dybde) + 112;
+        const labelX = midX + (side === "left" ? -18 : 18);
+
+        dimension(X(x1Meter), arrowY, X(x2Meter), arrowY, "", 0, 0);
+
+        ctx.save();
+        ctx.strokeStyle = "#111";
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(midX, arrowY);
+        ctx.lineTo(midX, labelY - 10);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        labelBox(text, labelX, labelY);
         ctx.restore();
     }
 
@@ -459,6 +497,8 @@ function tegn() {
 
     horizontalBoundary(toppLedningssone, "Ledningssone");
     horizontalBoundary(dybde - fundament, "Topp fundament");
+    labelBox(`Overdekning/gjenfylling ${overdekningAreal.toFixed(2)} m²`, X(0), Y(toppLedningssone / 2));
+    labelBox(`Ledningssone netto ${ledningssoneNettoAreal.toFixed(2)} m²`, X(0), Y(toppLedningssone) + 18);
     drawLegend();
 
     pipes.forEach(pipe => {
@@ -474,9 +514,9 @@ function tegn() {
     });
 
     dimension(X(-toppbredde / 2), Y(0) - 34, X(toppbredde / 2), Y(0) - 34, `Toppbredde ${formatMeter(toppbredde)}`);
-    dimension(X(-bunnbredde / 2), Y(dybde) + 24, X(bunnbredde / 2), Y(dybde) + 24, `Bunnbredde ${formatMeter(bunnbredde)}`, 0, 16);
-    dimension(X(-breddeVedRor / 2), Y(pipes[0].y), X(-rorPakkeBredde / 2), Y(pipes[0].y), formatMeter(sideAvstand), 0, -14);
-    dimension(X(rorPakkeBredde / 2), Y(pipes[0].y), X(breddeVedRor / 2), Y(pipes[0].y), formatMeter(sideAvstand), 0, -14);
+    dimension(X(-bunnbredde / 2), Y(dybde) + 10, X(bunnbredde / 2), Y(dybde) + 10, formatMeter(bunnbredde), 0, 14);
+    sideDistanceDimension(-breddeVedRor / 2, -rorPakkeBredde / 2, pipes[0].y, formatMeter(sideAvstand), "left");
+    sideDistanceDimension(rorPakkeBredde / 2, breddeVedRor / 2, pipes[0].y, formatMeter(sideAvstand), "right");
 
     pipes.slice(0, -1).forEach((pipe, index) => {
         const nextPipe = pipes[index + 1];
@@ -485,11 +525,11 @@ function tegn() {
 
     const dimX = X(toppbredde / 2) + 70;
     dimension(dimX, Y(0), dimX, Y(dybde), `Dybde ${formatMeter(dybde)}`, 60, 0);
-    dimension(dimX + 60, Y(0), dimX + 60, Y(pipes[pipes.length - 1].y - pipes[pipes.length - 1].radius), `Overdekning ${formatMeter(overdekning)}`, 86, 0);
+    dimension(dimX + 60, Y(0), dimX + 60, Y(toppLedningssone), `Overdekning ${formatMeter(overdekning)}`, 86, 0);
     dimension(dimX + 60, Y(dybde - fundament), dimX + 60, Y(dybde), `Fundament ${formatMeter(fundament)}`, 74, 0);
 }
 
-document.querySelectorAll("input").forEach(input => input.addEventListener("input", tegn));
+document.querySelectorAll("input, select").forEach(input => input.addEventListener("input", tegn));
 tegn();
 </script>
 </body>
